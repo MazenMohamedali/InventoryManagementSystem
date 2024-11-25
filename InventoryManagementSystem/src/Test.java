@@ -1,6 +1,6 @@
 import java.sql.*;
 public class Test {
-      static final String DB_URL = "jdbc:sqlite:clients.db";
+      static final String DB_URL = "jdbc:sqlite:database.db";
 
       public static void main(String[] args) 
       {
