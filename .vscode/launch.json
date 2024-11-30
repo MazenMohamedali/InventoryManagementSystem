@@ -9,6 +9,13 @@
       "name": "Test",
       "request": "launch",
       "mainClass": "Test.Test",
+      "projectName": "InventoryManagementSystem_a0fdde6c"
+    },
+    {
+      "type": "java",
+      "name": "Test",
+      "request": "launch",
+      "mainClass": "Test.Test",
       "projectName": "java_9fe42580"
     },
     {
