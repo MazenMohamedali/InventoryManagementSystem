@@ -4,5 +4,64 @@
   "java.project.referencedLibraries": [
     "lib/**/*.jar",
     "c:\\Users\\Msi\\Desktop\\sqlite-jdbc-3.47.0.0.jar"
+  ],
+  "sqltools.useNodeRuntime": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "name": "customer_churn_data",
+      "database": "customer_churn_data",
+      "username": "postgres"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "name": "employeedata",
+      "database": "employee_data",
+      "username": "postgres"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "name": "employeedata2",
+      "database": "employeedata2",
+      "username": "postgres"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "name": "dvdrental",
+      "database": "dvdrental",
+      "username": "postgres"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "askForPassword": true,
+      "driver": "PostgreSQL",
+      "name": "credit-card_customer",
+      "database": "credit_card_customers",
+      "username": "postgres"
+    },
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "database": "${workspaceFolder:InventoryManagementSystem}/src/database.db",
+      "name": "IMS"
+    }
   ]
 }
