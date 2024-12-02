@@ -5,6 +5,7 @@ CREATE TABLE client
       email VARCHAR(50) UNIQUE NOT NULL,
       address VARCHAR(100) NOT NULL,
       password VARCHAR(20) NOT NULL,
+	balance DECIMAL(10,2)
 );
 
 
@@ -31,56 +32,65 @@ CREATE TABLE product
       price DECIMAL(10, 2) NOT NULL,
       quantity INT NOT NULL,
       category VARCHAR(50) NOT NULL,
-      sup_id INT FOREIGN KEY REFERENCES supplier.id
+      sup_id INT,
+	FOREIGN KEY (sup_id) REFERENCES supplier(id)
 );
 
 CREATE TABLE client_phone_numbers
 (
-      id INT FOREIGN KEY REFERENCES client.id,
-      phone_number VARCHAR(20) NOT NULL,
-      PRIMARY KEY (id, phone_number)
+      id INT, 
+      phone_number VARCHAR(20) UNIQUE NOT NULL,
+      FOREIGN KEY (id) REFERENCES client(id),
+	PRIMARY KEY (id, phone_number)
 );
 
 
 CREATE TABLE admin_phone_numbers
 (
-      id INT FOREIGN KEY REFERENCES admin.id,
-      phone_number VARCHAR(20) NOT NULL,
-      PRIMARY KEY (id, phone_number)
+      id INT,
+      phone_number VARCHAR(20) UNIQUE NOT NULL,
+      FOREIGN KEY (id) REFERENCES admin(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (id, phone_number)
 );
 
 CREATE TABLE supplier_phone_numbers
 (
-      id INT FOREIGN KEY REFERENCES supplier.id,
-      phone_number VARCHAR(20) NOT NULL,
-      PRIMARY KEY (id, phone_number)
+      id INT,
+      phone_number VARCHAR(20) UNIQUE NOT NULL,
+      FOREIGN KEY (id) REFERENCES supplier(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (id, phone_number)
 );
 
 CREATE TABLE orders
 (
       id INT PRIMARY KEY NOT NULL,
-      client_id INT FOREIGN KEY REFERENCES client.id,
+      client_id INT,
       price DECIMAL(10,2),
       order_datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       arrival_date DATE,
-
+	FOREIGN KEY (id) REFERENCES client(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE order_prod
 (
-      prod_id INT FOREIGN KEY REFERENCES product.id,
-      order_id INT FOREIGN KEY REFERENCES orders.id,
+      prod_id INT, 
+      order_id INT,
       quantity INT NOT NULL,
+	FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (prod_id) REFERENCES product(id) ON DELETE CASCADE ON UPDATE CASCADE,
       PRIMARY KEY (prod_id, order_id)
 );
 
 CREATE TABLE complaints
 (
       complaint_id INT PRIMARY KEY NOT NULL,
-      client_id INT FOREIGN KEY REFERENCES client.id,
-      supplier_id INT FOREIGN KEY REFERENCES supplier.id,
+      client_id INT, 
+      supplier_id INT, 
       category VARCHAR (20),
-      order_id INT FOREIGN KEY REFERENCES orders.id,
-      complaint_datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      order_id INT,
       details VARCHAR(300) NOT NULL,
+      complaint_datetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

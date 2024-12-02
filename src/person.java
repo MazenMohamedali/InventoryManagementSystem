@@ -1,13 +1,21 @@
 
-public class person {
+public class Person {
 
     //datafields
-    int id;
-    int phone_no;
-    int password;
+    String phone_no;
+    String password;
     String email;
     String name;
     String address;
+
+
+    public Person(String name, String email, String phone_no, String password, String address) {
+        this.phone_no = phone_no;
+        this.password = password;
+        this.email = email;
+        this.name = name;
+        this.address = address;
+    }
 
     //method to create an account by taking data and store it in a table int the database
     //this method generate a random id for each user and store it to
