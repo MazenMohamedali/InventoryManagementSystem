@@ -39,7 +39,7 @@ CREATE TABLE product
 CREATE TABLE client_phone_numbers
 (
       id INT, 
-      phone_number VARCHAR(20) UNIQUE NOT NULL,
+      phone_number VARCHAR(20) NOT NULL,
       FOREIGN KEY (id) REFERENCES client(id),
 	PRIMARY KEY (id, phone_number)
 );
@@ -48,7 +48,7 @@ CREATE TABLE client_phone_numbers
 CREATE TABLE admin_phone_numbers
 (
       id INT,
-      phone_number VARCHAR(20) UNIQUE NOT NULL,
+      phone_number VARCHAR(20) NOT NULL,
       FOREIGN KEY (id) REFERENCES admin(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (id, phone_number)
 );
@@ -56,7 +56,7 @@ CREATE TABLE admin_phone_numbers
 CREATE TABLE supplier_phone_numbers
 (
       id INT,
-      phone_number VARCHAR(20) UNIQUE NOT NULL,
+      phone_number VARCHAR(20) NOT NULL,
       FOREIGN KEY (id) REFERENCES supplier(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	PRIMARY KEY (id, phone_number)
 );
