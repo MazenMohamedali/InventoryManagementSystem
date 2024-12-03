@@ -52,60 +52,55 @@ public class Client extends Person
       {
             String sql = "INSERT INTO client (id, name, email, address, password, balance) VALUES (?, ?, ?, ?, ?, ?)";
             String maxIDQuery = "SELECT MAX(id) AS max_id FROM client";
-
-            try
-            (
-                  Connection conn = DriverManager.getConnection(DB_URL);
-                  PreparedStatement pstmt = conn.prepareStatement(sql);
-                  PreparedStatement pstmt2 = conn.prepareStatement(maxIDQuery);
-                  ResultSet rs = pstmt2.executeQuery();
-            ) 
+            try (Connection conn = DriverManager.getConnection(DB_URL)) 
             {
-                  int max_ID = startID;
-                  if(rs.next())
+                  conn.setAutoCommit(false); // Enable transaction handling
+                  
+                  // Retrieve the current max ID
+                  try (Statement maxIDStatement = conn.createStatement();
+                       ResultSet rs = maxIDStatement.executeQuery(maxIDQuery)) 
                   {
-                        max_ID = rs.getInt("max_id");
-                        pstmt.setInt(1, max_ID + 1); 
-                        pstmt.setString(2, this.name);
-                        pstmt.setString(3, this.email);
-                        pstmt.setString(4, this.address);
-                        pstmt.setString(5, this.password);
-                        pstmt.setBigDecimal(6, BigDecimal.valueOf(this.balance));
-                        addPhoneNumber(max_ID, phone_no);
-                  }
-                  else
-                  {
+                        int max_ID = startID;
+                        if (rs.next()) 
+                        {
+                              max_ID = rs.getInt("max_id");
+                        }
+              
+                        // Insert into the client table
+                        try (PreparedStatement pstmt = conn.prepareStatement(sql)) 
+                        {
+                              pstmt.setInt(1, max_ID + 1);
+                              pstmt.setString(2, this.name);
+                              pstmt.setString(3, this.email);
+                              pstmt.setString(4, this.address);
+                              pstmt.setString(5, this.password);
+                              pstmt.setBigDecimal(6, BigDecimal.valueOf(this.balance));
+                              pstmt.executeUpdate();
+                        }
 
-                        pstmt.setInt(1, startID+1);
-                        pstmt.setString(2, this.name);
-                        pstmt.setString(3, this.email);
-                        pstmt.setString(4, this.address);
-                        pstmt.setString(5, this.password);
-                        pstmt.setBigDecimal(6, BigDecimal.valueOf(this.balance));
-                        addPhoneNumber(startID, phone_no);
+                        // Add phone number
+                        addPhoneNumber(conn, max_ID + 1, phone_no);
+                        
+                        // Commit the transaction
+                        conn.commit();
+                        System.out.println("Client and phone number added successfully.");
                   }
-                  
-                  // Execute the query
-                  pstmt.executeUpdate();
-                  
-                  // Log success
-                  System.out.println("Client added successfully.");
-                  conn.close();
             } 
             catch (SQLException e) 
             {
-                  System.err.println("Error: " + e.getMessage());
-                  // Log the error properly
+                  System.out.println("Error: " + e.getMessage());
+                  e.printStackTrace();
             }
       }
 
 
 
 
-      public static void addPhoneNumber(int id, String phone)
+
+
+      public static void addPhoneNumber(Connection conn ,int id, String phone)
       {
-            try(Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement pstmt = conn.prepareStatement("INSERT INTO client_phone_numbers (id, phone_number) VALUES (?,?)"))
+            try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO client_phone_numbers (id, phone_number) VALUES (?,?)"))
             {
                   pstmt.setInt(1, id);
                   pstmt.setString(2, phone);
@@ -113,7 +108,6 @@ public class Client extends Person
                   pstmt.executeUpdate();
                   System.out.println("number added");
 
-                  conn.close();
                   //log the operation
             }
             catch(SQLException e)
