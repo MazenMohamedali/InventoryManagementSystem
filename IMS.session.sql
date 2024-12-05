@@ -9,15 +9,6 @@ CREATE TABLE client
 );
 
 
-CREATE TABLE admin
-(
-      id INT PRIMARY KEY NOT NULL,
-      name VARCHAR(50) NOT NULL,
-      email VARCHAR(50) UNIQUE NOT NULL,
-      password VARCHAR(20) NOT NULL,
-      address VARCHAR(100) NOT NULL
-);
-
 CREATE TABLE supplier
 (
       id INT PRIMARY KEY NOT NULL,
@@ -32,34 +23,28 @@ CREATE TABLE product
       price DECIMAL(10, 2) NOT NULL,
       quantity INT NOT NULL,
       category VARCHAR(50) NOT NULL,
-      sup_id INT,
-	FOREIGN KEY (sup_id) REFERENCES supplier(id)
+      sup_id INT
 );
 
-CREATE TABLE client_phone_numbers
+CREATE TABLE prod_sup
 (
-      id INT, 
-      phone_number VARCHAR(20) NOT NULL,
-      FOREIGN KEY (id) REFERENCES client(id),
-	PRIMARY KEY (id, phone_number)
+      supplier_id INT NOT NULL,
+      prod_id INT NOT NULL,
+      FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE CASCADE,
+      FOREIGN KEY (prod_id) REFERENCES product(id) ON DELETE CASCADE,
+      PRIMARY KEY (supplier_id, prod_id)
 );
 
-
-CREATE TABLE admin_phone_numbers
+CREATE TABLE phone_numbers
 (
-      id INT,
-      phone_number VARCHAR(20) NOT NULL,
-      FOREIGN KEY (id) REFERENCES admin(id) ON DELETE CASCADE ON UPDATE CASCADE,
+      id INT NOT NULL, 
+      phone_number VARCHAR(15) NOT NULL UNIQUE,
 	PRIMARY KEY (id, phone_number)
+      --FOREIGN KEY (id) REFERENCES client(id) ON DELETE CASCADE,
+      --FOREIGN KEY (id) REFERENCES supplier(id) ON DELETE CASCADE
 );
 
-CREATE TABLE supplier_phone_numbers
-(
-      id INT,
-      phone_number VARCHAR(20) NOT NULL,
-      FOREIGN KEY (id) REFERENCES supplier(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	PRIMARY KEY (id, phone_number)
-);
+
 
 CREATE TABLE orders
 (
