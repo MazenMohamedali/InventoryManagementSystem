@@ -15,6 +15,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+//comment Order at actual implementation
+class Order
+{
+      int amount;
+      int[] prodID;
+      int[] pricePerID;
+      double[] totalPrice;
+      Date orderDate;
+      Date arrivalDate;
+      public Order(int[] id)
+      {
+      }
+}
+
+
 public class Client extends Person 
 {
       private static final String DB_URL = "jdbc:sqlite:src/database.db";
@@ -175,17 +190,3 @@ public class Client extends Person
       }
 }
 
-
-//comment Order at actual implementation
-class Order
-{
-      int amount;
-      int[] prodID;
-      int[] pricePerID;
-      double[] totalPrice;
-      Date orderDate;
-      Date arrivalDate;
-      public Order(int[] id)
-      {
-      }
-}
