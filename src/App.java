@@ -1,19 +1,16 @@
+import java.sql.SQLException;
 
 public class App 
 {
     public static void main(String[] args)
     {
-        try
+        try 
         {
-            var c = Client.getData(10000);
-            System.out.println(c.get(0).id);
-
-            Client client = new Client("null", 0, "null", "null", "null", "null", 0);
-            Client.addToClientTable(client);
-        }
-        catch(Exception e)
+            System.out.println(Client.deletePhoneNumber(10002, "null"));
+        } 
+        catch (SQLException e) 
         {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

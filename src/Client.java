@@ -179,7 +179,56 @@ public class Client extends Person
             
             return data;
       }
-      
+
+
+      public static int deletePhoneNumber(int id, String phoneNumber) throws SQLException
+      {
+            int rowsAffected = 0;
+            String selectQuery = "select * from client_phone_numbers where id = ?";
+            String deleteQuery = "delete from client_phone_numbers where id = ? and phone_number = ?";
+            ArrayList<String> numbers = new ArrayList<String>();
+
+
+            try(Connection conn = DriverManager.getConnection(DB_URL))
+            {
+                  conn.setAutoCommit(false);
+                  try (PreparedStatement s = conn.prepareStatement(selectQuery))
+                  {
+
+                        s.setInt(1, id);
+                        ResultSet rs = s.executeQuery();
+                        
+                        while(rs.next())
+                        {
+                              numbers.add(rs.getString(2));
+                        }
+                  }
+                  catch(SQLException e)
+                  {
+                        System.err.println("cannot establish a connection" + e.getMessage());
+                        return 0;
+                  }
+                  if(numbers.contains(phoneNumber))
+                  {
+                        try(PreparedStatement d = conn.prepareStatement(deleteQuery))
+                        {
+                              d.setInt(1, id);
+                              d.setString(2, phoneNumber);
+                              rowsAffected = d.executeUpdate();
+                        }
+                        catch(SQLException e)
+                        {
+                              System.err.println(e.getCause());
+                        }
+                  }
+                  else
+                  {
+                        throw new SQLException("phone number does not exist or does not belong to the customer");
+                  }
+                  conn.commit();
+            }
+            return rowsAffected;
+      }
 
 
       public void placeOrder(int[] orderIDs)
