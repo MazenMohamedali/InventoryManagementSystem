@@ -1,4 +1,4 @@
-/* package Test;
+package Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -35,4 +35,4 @@ public class Test extends Application {
             System.out.println("unsuccessful");
         }
     }
-} */
+} 
