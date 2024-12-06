@@ -4,22 +4,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class Supplier {
-}
-
-class Product {
-}
-
 public class Admin {
 
-    private static final String DB_URL = "jdbc:sqlite:src/database.db";
+    private static final String DB_URL = "jdbc:sqlite:C:\\Users\\Msi\\Desktop\\GitHub\\InventoryManagementSystem\\databaseIMS.db";
 
     Supplier sup;
-    Product product;
     // Report report;
 
     // ADD SUPPLIER ---> DONE
-    public static boolean addSupplier(String sup_name, String sup_email, String phone_number) {// NEED Supplier CLASS
+    public static boolean addSupplier(Supplier sup) {// NEED Supplier CLASS
 
         String sql = "INSERT INTO supplier (id,name,email) VALUES (?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -27,14 +20,14 @@ public class Admin {
 
             int sup_id = supplierMaxId() + 1;
             stmt.setInt(1, sup_id);
-            stmt.setString(2, sup_name);
-            stmt.setString(3, sup_email);
+            stmt.setString(2, sup.getName());
+            stmt.setString(3, sup.getEmail());
 
             PreparedStatement stmt2 = conn
-                    .prepareStatement("INSERT INTO supplier_phone_numbers (id,phone_number) VALUES (?,?)");
+                    .prepareStatement("INSERT INTO phone_numbers (id,phone_number) VALUES (?,?)");
 
             stmt2.setInt(1, sup_id);
-            stmt2.setString(2, phone_number);
+            stmt2.setString(2, sup.getPhone_no());
 
             return stmt.executeUpdate() > 0 && stmt2.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -61,20 +54,21 @@ public class Admin {
     }
 
     // ADD PHONE NUMBER ---> DONE ------> NO NEED
-    // public static boolean addPhoneNumber(Connection conn, int id, String phone) {
-    // try (PreparedStatement pstmt = conn
-    // .prepareStatement("INSERT INTO supplier_phone_numbers (id, phone_number)
-    // VALUES (?,?)")) {
-    // pstmt.setInt(1, id);
-    // pstmt.setString(2, phone);
+    public static boolean addPhoneNumber(Connection conn, int id, String phone) {
+        try (PreparedStatement pstmt = conn
+                .prepareStatement("INSERT INTO phone_numbers (id, phone_number)VALUES (?,?)")) {
+            pstmt.setInt(1, id);
+            pstmt.setString(2, phone);
 
-    // int rowsAffected = pstmt.executeUpdate();
-    // return rowsAffected > 0;
-    // } catch (SQLException e) {
-    // System.out.println(e.getMessage());
-    // return false;
-    // }
-    // }
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (
+
+        SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 
     // DELETE SUPPLIER ---> DONE
     public static boolean deleteSupplier(int supId) {
