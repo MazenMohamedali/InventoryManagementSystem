@@ -32,20 +32,20 @@ class Order
 
 public class Client extends Person 
 {
-      private static final String DB_URL = "jdbc:sqlite:src/database.db";
-      private static int startID = 10000;
+      private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
+      private static final int startID = 10000;
       private static int orderCount;
       public double balance = 0;
       public String phoneNumber = "";
-      public int id;
+      public int id = startID;
       
       
       
-      public Client(String name, int id, String email, String password, String address, String phone_no, double balance)
+      public Client(String name, String email, String password, String address, String phone_no, double balance)
       {
             super(name, email, phone_no, password, address);
             this.balance = balance;
-            this.id = id;
+            this.id = startID;
       }
       
       
@@ -62,8 +62,13 @@ public class Client extends Person
                   try (Statement maxIDStatement = conn.createStatement();
                   ResultSet rs = maxIDStatement.executeQuery(maxIDQuery)) 
                   {
-                        int max_ID = startID;
-                        if (rs.next()) 
+                        int max_ID;
+                        rs.next();
+                        if (rs.getInt(1) == 0)
+                        {
+                              max_ID = startID;
+                        }
+                        else
                         {
                               max_ID = rs.getInt("max_id");
                         }
@@ -102,7 +107,7 @@ public class Client extends Person
       
       public static void addPhoneNumber(Connection conn ,int id, String phone)
       {
-            try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO client_phone_numbers (id, phone_number) VALUES (?,?)"))
+            try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO phone_numbers (id, phone_number) VALUES (?,?)"))
             {
                   pstmt.setInt(1, id);
                   pstmt.setString(2, phone);
@@ -146,10 +151,10 @@ public class Client extends Person
       public static ArrayList<Client> getData(int id) throws SQLException 
       {
             Connection conn = DriverManager.getConnection(DB_URL);
-            String sql = "SELECT client.name, client.id, client_phone_numbers.phone_number, client.email, client.address, client.balance, password " +
+            String sql = "SELECT client.name, client.id, phone_numbers.phone_number, client.email, client.address, client.balance, password " +
             "FROM client " + 
-            "JOIN client_phone_numbers " + 
-            "ON client.id = client_phone_numbers.id " + 
+            "JOIN phone_numbers " + 
+            "ON client.id = phone_numbers.id " + 
             "WHERE client.id = ?";
             
             PreparedStatement p = conn.prepareStatement(sql);
@@ -161,7 +166,7 @@ public class Client extends Person
             var data = new ArrayList<Client>();
             while (rs.next()) 
             {
-                  Client client = new Client("", 0,"", "", "", "", 0);
+                  Client client = new Client("", "", "", "", "", 0);
                   client.name = rs.getString(1);
                   client.id = rs.getInt(2);
                   client.phoneNumber = rs.getString(3);
@@ -184,8 +189,8 @@ public class Client extends Person
       public static int deletePhoneNumber(int id, String phoneNumber) throws SQLException
       {
             int rowsAffected = 0;
-            String selectQuery = "select * from client_phone_numbers where id = ?";
-            String deleteQuery = "delete from client_phone_numbers where id = ? and phone_number = ?";
+            String selectQuery = "select * from phone_numbers where id = ?";
+            String deleteQuery = "delete from phone_numbers where id = ? and phone_number = ?";
             ArrayList<String> numbers = new ArrayList<String>();
 
 
