@@ -235,7 +235,6 @@ public class Client extends Person
       {
             orderCount++;
             Order order = new Order(orderIDs);
-            //the products ordered get reduced
       }
 }
 
