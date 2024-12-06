@@ -18,22 +18,32 @@ public class Admin {
     Product product;
     // Report report;
 
-    public void addSupplier(Supplier sup) {
+    // ADD SUPPLIER ---> DONE
+    public static boolean addSupplier(String sup_name, String sup_email, String phone_number) {// NEED Supplier CLASS
 
-        String sql = "INSERT INTO supplier (name,email) VALUES (?,?)";
+        String sql = "INSERT INTO supplier (id,name,email) VALUES (?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, sup.getName());
-            stmt.setString(2, sup.getEmail());
+            int sup_id = supplierMaxId() + 1;
+            stmt.setInt(1, sup_id);
+            stmt.setString(2, sup_name);
+            stmt.setString(3, sup_email);
 
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("RAWS AFFECTED: " + rowsAffected);
+            PreparedStatement stmt2 = conn
+                    .prepareStatement("INSERT INTO supplier_phone_numbers (id,phone_number) VALUES (?,?)");
+
+            stmt2.setInt(1, sup_id);
+            stmt2.setString(2, phone_number);
+
+            return stmt.executeUpdate() > 0 && stmt2.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
+    // GET SUPPLIER LAST ID ---> DONE
     public static int supplierMaxId() {
         try (Connection conn = DriverManager.getConnection(DB_URL);
                 PreparedStatement stmt = conn.prepareStatement("SELECT MAX(id) AS max_id FROM supplier")) {
@@ -43,31 +53,48 @@ public class Admin {
             if (rs.next()) {
                 return rs.getInt("max_id");
             } else
-                return 0;
+                return -1;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return 0;
+            return -1;
         }
     }
 
-    public static void addPhoneNumber(Connection conn, int id, String phone) {
-        try (PreparedStatement pstmt = conn
-                .prepareStatement("INSERT INTO supplier_phone_numbers (id, phone_number) VALUES (?,?)")) {
-            pstmt.setInt(1, id);
-            pstmt.setString(2, phone);
+    // ADD PHONE NUMBER ---> DONE ------> NO NEED
+    // public static boolean addPhoneNumber(Connection conn, int id, String phone) {
+    // try (PreparedStatement pstmt = conn
+    // .prepareStatement("INSERT INTO supplier_phone_numbers (id, phone_number)
+    // VALUES (?,?)")) {
+    // pstmt.setInt(1, id);
+    // pstmt.setString(2, phone);
 
-            pstmt.executeUpdate();
-            System.out.println("number added");
+    // int rowsAffected = pstmt.executeUpdate();
+    // return rowsAffected > 0;
+    // } catch (SQLException e) {
+    // System.out.println(e.getMessage());
+    // return false;
+    // }
+    // }
 
-            // log the operation
+    // DELETE SUPPLIER ---> DONE
+    public static boolean deleteSupplier(int supId) {
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement stmt = conn.prepareStatement("DELETE FROM supplier WHERE id = ?")) {
+
+            stmt.setInt(1, supId);
+
+            int rowsAffected = stmt.executeUpdate();
+            System.out.println("RAWS AFFECTED: " + rowsAffected);
+            return rowsAffected > 0;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            // log the error
+            return false;
         }
     }
 
-    // UNDER BUILD
-    public void addProduct(Product product) {
+    // ADD PRODUCT
+    public void addProduct(Product product) {// NEED Product CLASS
 
         String sql = "INSERT INTO supplier (name,price,quantity,category,sup_id) VALUES(?,?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -86,18 +113,18 @@ public class Admin {
         }
     }
 
-    public void deleteSupplier(int supId) {
+    // CHECK IF SUPPLIER ID EXIST ---> DONE
+    public static boolean checkSupllierId(Connection conn, int sup_id) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
 
-        String sql = "DELETE FROM supplier WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, sup_id);
 
-            stmt.setInt(1, supId);
+            ResultSet rs = stmt.executeQuery();
 
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("RAWS AFFECTED: " + rowsAffected);
+            return rs.next();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
