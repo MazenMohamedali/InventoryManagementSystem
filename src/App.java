@@ -3,7 +3,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class App {
-<<<<<<< HEAD
     public static final String DB_URL = "jdbc:sqlite:C:\\Users\\Msi\\Desktop\\GitHub\\InventoryManagementSystem\\databaseIMS.db";
 
     public static void main(String[] args) throws SQLException {
@@ -15,12 +14,5 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }
-=======
-    public static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
-
-    public static void main(String[] args) throws SQLException 
-    {
-        
->>>>>>> 647abb0062052adaf3fcd56cc56beb82b959fa07
     }
 }
