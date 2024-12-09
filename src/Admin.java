@@ -6,9 +6,11 @@ import java.sql.SQLException;
 
 public class Admin {
 
-    private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db"; //relative path is better for all of us (look at Client.DB_URL)
+    private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db"; // relative path is better for all of us (look
+                                                                         // at Client.DB_URL)
 
     Supplier sup;
+    Product prod;
     // Report report;
 
     // ADD SUPPLIER ---> DONE
@@ -31,7 +33,7 @@ public class Admin {
 
             return stmt.executeUpdate() > 0 && stmt2.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Add Supplier EROR 001");
             return false;
         }
     }
@@ -48,7 +50,7 @@ public class Admin {
             } else
                 return -1;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Supplier MaxId EROR 002");
             return -1;
         }
     }
@@ -65,7 +67,7 @@ public class Admin {
         } catch (
 
         SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Phone Number EROR 003");
             return false;
         }
     }
@@ -94,11 +96,11 @@ public class Admin {
         try (Connection conn = DriverManager.getConnection(DB_URL);
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, sup.getName());
-            stmt.setDouble(2, sup.getPrice());
-            stmt.setInt(3, sup.getQuantity());
-            stmt.setString(4, prdct.getCategory());
-            stmt.setInt(5, prdct.sup.getId());
+            stmt.setString(1, prod.getName());
+            stmt.setDouble(2, prod.getPrice());
+            stmt.setInt(3, prod.getQuantity());
+            // stmt.setString(4, prod.getCategory());
+            stmt.setInt(5, prod.getSupplierID());
 
             int rowsAffected = stmt.executeUpdate();
             System.out.println("RAWS AFFECTED: " + rowsAffected);

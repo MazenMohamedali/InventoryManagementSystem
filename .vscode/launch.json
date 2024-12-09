@@ -6,6 +6,20 @@
   "configurations": [
     {
       "type": "java",
+      "name": "AdminINF",
+      "request": "launch",
+      "mainClass": "AdminINF",
+      "projectName": "InventoryManagementSystem_7b9eace0"
+    },
+    {
+      "type": "java",
+      "name": "AdminINF",
+      "request": "launch",
+      "mainClass": "interace.AdminINF",
+      "projectName": "InventoryManagementSystem_7b9eace0"
+    },
+    {
+      "type": "java",
       "name": "Test",
       "request": "launch",
       "mainClass": "Test.Test",
