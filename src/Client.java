@@ -36,7 +36,6 @@ public class Client extends Person
       private static final int startID = 10000;
       private static int orderCount;
       public double balance = 0;
-      public String phoneNumber = "";
       public int id = startID;
       
       
@@ -77,16 +76,16 @@ public class Client extends Person
                         try (PreparedStatement pstmt = conn.prepareStatement(sql)) 
                         {
                               pstmt.setInt(1, max_ID + 1);
-                              pstmt.setString(2, c.name);
-                              pstmt.setString(3, c.email);
-                              pstmt.setString(4, c.address);
-                              pstmt.setString(5, c.password);
+                              pstmt.setString(2, c.getName());
+                              pstmt.setString(3, c.getEmail());
+                              pstmt.setString(4, c.getAddress());
+                              pstmt.setString(5, c.getPassword());
                               pstmt.setBigDecimal(6, BigDecimal.valueOf(c.balance));
                               pstmt.executeUpdate();
                         }
                         
                         // Add phone number
-                        addPhoneNumber(conn, max_ID + 1, c.phone_no);
+                        addPhoneNumber(conn, max_ID + 1, c.getPhone_no());
                         
                         // Commit the transaction
                         conn.commit();
@@ -113,8 +112,6 @@ public class Client extends Person
                   pstmt.setString(2, phone);
                   
                   pstmt.executeUpdate();
-                  System.out.println("number added");
-                  
                   //log the operation
             }
             catch(SQLException e)
@@ -167,13 +164,13 @@ public class Client extends Person
             while (rs.next()) 
             {
                   Client client = new Client("", "", "", "", "", 0);
-                  client.name = rs.getString(1);
+                  client.setName(rs.getString(1));
                   client.id = rs.getInt(2);
-                  client.phoneNumber = rs.getString(3);
-                  client.email = rs.getString(4);
-                  client.address = rs.getString(5);
+                  client.setPhone_no(rs.getString(3)); 
+                  client.setEmail(rs.getString(4));
+                  client.setAddress(rs.getString(5));
                   client.balance = rs.getDouble(6);
-                  client.password = rs.getString(7);
+                  client.setPassword(rs.getString(7));
                   
                   data.add(client); // Assign the object to the array
             }
@@ -231,6 +228,7 @@ public class Client extends Person
                         throw new SQLException("phone number does not exist or does not belong to the customer");
                   }
                   conn.commit();
+                  conn.close();
             }
             return rowsAffected;
       }
@@ -240,6 +238,38 @@ public class Client extends Person
       {
             orderCount++;
             Order order = new Order(orderIDs);
+      }
+
+      public static void updateData(Client c, int id)
+      {
+
+            String sql = "UPDATE client SET name = ?, email = ?, address = ?, password = ?, balance = ? WHERE id = ?";
+            try(Connection conn = DriverManager.getConnection(DB_URL))
+            {
+                  conn.setAutoCommit(false);
+                  try
+                  {
+                        PreparedStatement pstmt = conn.prepareStatement(sql);
+                        pstmt.setString(1, c.getName());
+                        pstmt.setString(2, c.getEmail());
+                        pstmt.setString(3, c.getAddress());
+                        pstmt.setString(4, c.getPassword());
+                        pstmt.setBigDecimal(5, BigDecimal.valueOf(c.balance));
+                        pstmt.setInt(6, id);
+                        pstmt.executeUpdate();
+                        System.out.println("Client data updated successfully.");
+                  }
+                  catch (SQLException e)
+                  {
+                        System.out.println("Error: " + e.getMessage());
+                        e.printStackTrace();
+                  }
+                  conn.commit();
+            }
+            catch(SQLException e)
+            {
+                  System.out.println(e.getStackTrace());
+            }
       }
 }
 

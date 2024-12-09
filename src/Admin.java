@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class Admin {
 
-    private static final String DB_URL = "jdbc:sqlite:C:\\Users\\Msi\\Desktop\\GitHub\\InventoryManagementSystem\\databaseIMS.db";
+    private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db"; //relative path is better for all of us (look at Client.DB_URL)
 
     Supplier sup;
     // Report report;
