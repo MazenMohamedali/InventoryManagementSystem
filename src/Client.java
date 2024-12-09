@@ -1,12 +1,4 @@
-
-/*
-
-/**
- *
- * @author yousf
- */
 import java.util.ArrayList;
-import java.util.Date;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 //comment Order at actual implementation
+/* 
 class Order
 {
       int amount;
@@ -28,7 +21,7 @@ class Order
       {
       }
 }
-
+ */
 
 public class Client extends Person 
 {
@@ -237,7 +230,7 @@ public class Client extends Person
       public void placeOrder(int[] orderIDs)
       {
             orderCount++;
-            Order order = new Order(orderIDs);
+            //TODO DB interactions
       }
 
       public static void updateData(Client c, int id)
