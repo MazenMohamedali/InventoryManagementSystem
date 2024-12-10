@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Product",
+      "request": "launch",
+      "mainClass": "Product",
+      "projectName": "InventoryManagementSystem_48c6d6bc"
+    },
+    {
+      "type": "java",
       "name": "AdminINF",
       "request": "launch",
       "mainClass": "AdminINF",
