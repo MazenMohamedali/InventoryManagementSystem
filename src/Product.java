@@ -103,8 +103,8 @@ public class Product {
     public void insertProduct() {
         String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection connection = DriverManager.getConnection(connectDB.getDburl());
-        PreparedStatement statement = connection.prepareStatement(sqlquary)) {
+        try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
+                PreparedStatement statement = connection.prepareStatement(sqlquary)) {
             statement.setString(1, getName());
             statement.setBigDecimal(2, BigDecimal.valueOf(getPrice()));
             statement.setInt(3, getQuantity());
@@ -113,43 +113,55 @@ public class Product {
             statement.setDate(6, new java.sql.Date(getExpirDate().getTime())); // Set the expiration date
             statement.setDate(7, new java.sql.Date(getProductionDate().getTime())); // Set the production date
             statement.setInt(8, getId()); // Set the production date
-            
+
             statement.executeUpdate();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     // for alter becuse i alrdy alterd from data base but not effectd in java
     public void addColumnsToProduct() {
-    String alterExpireDate = "ALTER TABLE product ADD COLUMN expireDate TEXT NOT NULL;";
-    String alterProductionDate = "ALTER TABLE product ADD COLUMN productionDate TEXT NOT NULL;";
+        String alterExpireDate = "ALTER TABLE product ADD COLUMN expireDate TEXT NOT NULL;";
+        String alterProductionDate = "ALTER TABLE product ADD COLUMN productionDate TEXT NOT NULL;";
 
-    try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
-         Statement statement = connection.createStatement()) {
-        
-        // Execute the first ALTER TABLE statement
-        statement.executeUpdate(alterExpireDate);
-        System.out.println("expireDate column added successfully.");
-        
-        // Execute the second ALTER TABLE statement
-        statement.executeUpdate(alterProductionDate);
-        System.out.println("productionDate column added successfully.");
-        
-    } catch (SQLException e) {
-        // Handle SQL exceptions
-        e.printStackTrace();
+        try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
+                Statement statement = connection.createStatement()) {
+
+            // Execute the first ALTER TABLE statement
+            statement.executeUpdate(alterExpireDate);
+            System.out.println("expireDate column added successfully.");
+
+            // Execute the second ALTER TABLE statement
+            statement.executeUpdate(alterProductionDate);
+            System.out.println("productionDate column added successfully.");
+
+        } catch (SQLException e) {
+            // Handle SQL exceptions
+            e.printStackTrace();
+        }
     }
-}
 
     Product() {
     }
 
-    Product(int id, String name, double price, int initialQuantity, int supplierID, String category, String exDate, String proDate) {
+    Product(int id, String name, double price, int initialQuantity, int supplierID, String category, String exDate,
+            String proDate) {
         setName(name);
         setPrice(price);
         setQuantity(initialQuantity);
         setID(id);
+        setSupplierID(supplierID);
+        setExpirDate(exDate);
+        setProductionDate(proDate);
+        setCategory(category);
+    }
+
+    Product(String name, double price, int initialQuantity, int supplierID, String category, String exDate,
+            String proDate) {
+        setName(name);
+        setPrice(price);
+        setQuantity(initialQuantity);
         setSupplierID(supplierID);
         setExpirDate(exDate);
         setProductionDate(proDate);
@@ -294,9 +306,12 @@ public class Product {
 
     public void main(String[] args) {
         // addColumnsToProduct();
-        // Product test = new Product(7002, "Bread", 0.99, 100, 11, "Bakery", "2024-12-31", "2024-12-01");
-        // Product test2 = new Product(7003, "Eggs", 3.49, 30, 12, "Dairy", "2025-01-05", "2024-11-20");
-        // Product test = new Product(7004, "Bread", 0.99, 100, 11, "Bakery", "2024-12-31", "2024-12-01");
+        // Product test = new Product(7002, "Bread", 0.99, 100, 11, "Bakery",
+        // "2024-12-31", "2024-12-01");
+        // Product test2 = new Product(7003, "Eggs", 3.49, 30, 12, "Dairy",
+        // "2025-01-05", "2024-11-20");
+        // Product test = new Product(7004, "Bread", 0.99, 100, 11, "Bakery",
+        // "2024-12-31", "2024-12-01");
         // test.insertProduct();
         // test2.insertProduct();
         // System.out.println(SHOWSPPLIER());
