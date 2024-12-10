@@ -89,6 +89,21 @@ public class Admin {
         }
     }
 
+    // CHECK IF SUPPLIER ID EXIST ---> DONE
+    public static boolean checkSupllierId(Connection conn, int sup_id) {
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
+
+            stmt.setInt(1, sup_id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
     // ADD PRODUCT
     public void addProduct(Product product) {// NEED Product CLASS
 
@@ -109,21 +124,7 @@ public class Admin {
         }
     }
 
-    // CHECK IF SUPPLIER ID EXIST ---> DONE
-    public static boolean checkSupllierId(Connection conn, int sup_id) {
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
-
-            stmt.setInt(1, sup_id);
-
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
-
+    // Delete Product
     public void deleteProduct(int prouctId) {
 
         String sql = "DELETE FROM product WHERE id = ?";

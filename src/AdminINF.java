@@ -18,6 +18,7 @@ public class AdminINF {
             case 1:
                 supllierMenu();
             default:
+                System.out.println("\t-->Wrong input try later<--");
                 break;
         }
     }
@@ -26,26 +27,27 @@ public class AdminINF {
         System.out.println("\nAdmin Menu:");
         System.out.println("1. Add Supplier");
         System.out.println("2. Delete Supplier");
-        System.out.println("4. Add More Than One Supplier");
-        System.out.println("3. Exit");
+        System.out.println("3. Add More Than One Supplier");
+        System.out.println("4. Exit");
         System.out.print("Enter your choice: ");
         int choice = input.nextInt();
         input.nextLine();
         switch (choice) {
             case 1:
                 addSupplier();
+                supllierMenu();
                 break;
             case 2:
                 deleteSupplier();
+                supllierMenu();
                 break;
             case 3:
                 System.out.println("Enter Number Of Suppliers:");
                 int cntr = input.nextInt();
                 input.nextLine();
-                while (cntr-- != 0) {
-                    addSupplier();
-                }
+                addSupplier(cntr);
             default:
+                System.out.println("\t-->Wrong input try later<--");
                 break;
         }
     }
@@ -66,8 +68,15 @@ public class AdminINF {
 
         } else {
             System.out.println("Somthing Went Wrong");
+            System.exit(1);
         }
-        supllierMenu();
+    }
+
+    static void addSupplier(int n) {
+        while (n > 0) {
+            addSupplier();
+            n--;
+        }
     }
 
     static void deleteSupplier() {
@@ -82,9 +91,6 @@ public class AdminINF {
         } else {
             System.out.println("Somthing Went Wrong");
         }
-
-        supllierMenu();
-
     }
 
     public static void main() {

@@ -9,6 +9,13 @@
       "name": "Product",
       "request": "launch",
       "mainClass": "Product",
+      "projectName": "InventoryManagementSystem_7b9eace0"
+    },
+    {
+      "type": "java",
+      "name": "Product",
+      "request": "launch",
+      "mainClass": "Product",
       "projectName": "InventoryManagementSystem_48c6d6bc"
     },
     {
