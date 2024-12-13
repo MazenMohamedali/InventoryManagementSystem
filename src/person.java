@@ -1,5 +1,5 @@
 
-public class Person {
+public class person {
 
     // datafields
     private String phone_no;
@@ -8,16 +8,16 @@ public class Person {
     private String name;
     private String address;
 
-    Person() {
+    person() {
     }
 
-    Person(String name, String email, String phone) {
+    person(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone_no = phone;
     }
 
-    public Person(String name, String email, String phone_no, String password, String address) {
+    public person(String name, String email, String phone_no, String password, String address) {
         this.phone_no = phone_no;
         this.password = password;
         this.email = email;

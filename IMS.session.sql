@@ -31,26 +31,6 @@ ALTER TABLE product
 ALTER TABLE product
       ADD COLUMN productionDate TEXT NOT NULL;
 
--- just for test
--- INSERT OR IGNORE INTO supplier (id, name, email)
--- VALUES
--- (10, 'Dairy Supplier', 'dairy@example.com'),
--- (11, 'Bakery Supplier', 'bakery@example.com'),
--- (12, 'Fruit Supplier', 'fruit@example.com');
-
--- INSERT INTO product (id, name, price, quantity, sup_id, category, expireDate, productionDate)
--- VALUES
--- (7001, 'Milk', 1.99, 50, 10, 'Dairy', '2024-12-31', '2024-12-01'),
--- (7002, 'Bread', 0.99, 100, 11, 'Bakery', '2024-12-10', '2024-11-25'),
--- (7003, 'Eggs', 3.49, 30, 12, 'Dairy', '2025-01-05', '2024-11-20');
-
-
--- INSERT INTO prod_sup (supplier_id, prod_id)
--- VALUES
--- (10, 7001),  -- Dairy Supplier provides Milk
--- (11, 7002),  -- Bakery Supplier provides Bread
--- (12, 7003);  -- Fruit Supplier provides Apples
-
 
 
 CREATE TABLE prod_sup
@@ -67,8 +47,6 @@ CREATE TABLE phone_numbers
       id INT NOT NULL, 
       phone_number VARCHAR(15) NOT NULL UNIQUE,
 	PRIMARY KEY (id, phone_number)
-      --FOREIGN KEY (id) REFERENCES client(id) ON DELETE CASCADE,
-      --FOREIGN KEY (id) REFERENCES supplier(id) ON DELETE CASCADE
 );
 
 
