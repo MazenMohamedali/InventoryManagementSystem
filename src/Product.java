@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,16 +22,16 @@ public class Product {
 
     // VALIDATION METHODS
     private static boolean isValidDate(String date) {
-        //            dd-mm-yyyy-isvalid                 --0 for not valid ,, 1 for valid
-        int[] arrDate = {0, 0, 0};
-        if(date.length()>10)
+        // dd-mm-yyyy-isvalid --0 for not valid ,, 1 for valid
+        int[] arrDate = { 0, 0, 0 };
+        if (date.length() > 10)
             return false;
 
         String[] separteDate = date.trim().split("-");
-        if(separteDate.length != 3) 
+        if (separteDate.length != 3)
             return false;
 
-        if(separteDate[0].length() > 2 || separteDate[1].length()>2 ||separteDate[2].length()>4)
+        if (separteDate[0].length() > 2 || separteDate[1].length() > 2 || separteDate[2].length() > 4)
             return false;
 
         arrDate[0] = Integer.parseInt(separteDate[0]);
@@ -45,7 +46,6 @@ public class Product {
         int daysInMonth = yearMonth.lengthOfMonth();
         return arrDate[0] <= daysInMonth;
     }
-
 
     // CONSTRUCTORS
     Product() {
@@ -63,6 +63,16 @@ public class Product {
         setCategory(category);
     }
 
+    Product(String name, double price, int initialQuantity, int supplierID, String category, String exDate,
+            String proDate) {
+        setName(name);
+        setPrice(price);
+        setQuantity(initialQuantity);
+        setSupplierID(supplierID);
+        setExpirDate(exDate);
+        setProductionDate(proDate);
+        setCategory(category);
+    }
 
     // Getters
     public int getId() {
@@ -97,7 +107,6 @@ public class Product {
         return productionDate;
     }
 
-
     // SETTER
     public void setCategory(String category) {
         if (category.length() > maxchar) {
@@ -131,10 +140,9 @@ public class Product {
         this.supplierID = supplierID;
     }
 
-    
     // DATE FORMATE dd-mm-yyyy
     public void setExpirDate(String expirDate) {
-        if(isValidDate(expirDate))
+        if (isValidDate(expirDate))
             this.expirDate = expirDate;
         else {
             throw new IllegalArgumentException("Invalid expiration date format or value: " + expirDate);
@@ -142,7 +150,7 @@ public class Product {
     }
 
     public void setProductionDate(String productionDate) {
-        if(isValidDate(productionDate))
+        if (isValidDate(productionDate))
             this.productionDate = productionDate;
         else {
             throw new IllegalArgumentException("Invalid expiration date format or value: " + expirDate);
@@ -153,7 +161,6 @@ public class Product {
         this.id = id;
     }
 
-
     // SEARCH METHODS
     private static String search(String table, String column, String value) {
         String sqlquery = "SELECT * FROM " + table + " WHERE " + column + " = ?";
@@ -161,7 +168,7 @@ public class Product {
         try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
                 PreparedStatement statement = connection.prepareStatement(sqlquery)) {
 
-            statement.setString(1, value); 
+            statement.setString(1, value);
             ResultSet resultSet = statement.executeQuery();
 
             StringBuilder res = new StringBuilder();
@@ -193,15 +200,60 @@ public class Product {
     }
 
     public static String searchProductProduction(String productProductionDate) {
-        if(isValidDate(productProductionDate))
+        if (isValidDate(productProductionDate))
             return "not found";
         return search("product", "ProductionDate", productProductionDate);
     }
 
     public static String searchProductExpiration(String productExpirationDate) {
-        if(isValidDate(productExpirationDate))
+        if (isValidDate(productExpirationDate))
             return "not found";
         return search("product", "expireDate", productExpirationDate);
+    }
+
+    // SHOW ALL FUNC --> OMAR MOHSEN <--
+    static void showAll() {
+
+        try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+                PreparedStatement stmt = conn.prepareStatement("SELECT id,name FROM product")) {
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("ID\t\tName");
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                System.out.println(id + "\t\t" + name);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("SOMTHING WENT WRONG" + e.getMessage());
+        }
+    }
+
+    static void showProuct(int id) {
+
+        try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM product WHERE id = ?")) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("----------------------------------------------------------------------");
+            System.out.printf("%-10s %-20s %-20s %-10s %-10s %-10s%n",
+                    "ID", "Name", "Category", "Price", "Quantity", "Supplier_ID");
+
+            String name = rs.getString("name");
+            BigDecimal price = rs.getBigDecimal("price");
+            int quantity = rs.getInt("quantity");
+            String category = rs.getString("category");
+            int sup_id = rs.getInt("sup_id");
+
+            System.out.printf("%-10d %-20s %-20s %-10.2f %-10d %-10d%n",
+                    id, name, category, price, quantity, sup_id);
+            System.out.println("----------------------------------------------------------------------");
+        } catch (SQLException e) {
+            System.out.println("SOMTHING WENT WRONG" + e.getMessage());
+        }
     }
 
 }
