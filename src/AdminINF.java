@@ -18,37 +18,43 @@ public class AdminINF {
                 break;
             case 1:
                 supllierMenu();
+                break;
             case 2:
                 productMenu();
+                break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
                 break;
         }
     }
 
+    // ###############################################################################################
     static void supllierMenu() {
         System.out.println("\nAdmin Menu:");
         System.out.println("1. Add Supplier");
         System.out.println("2. Delete Supplier");
         System.out.println("3. Add More Than One Supplier");
-        System.out.println("4. Exit");
+        System.out.println("4. Upate Supplier Email");
+        System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
         int choice = input.nextInt();
         input.nextLine();
         switch (choice) {
             case 1:
                 addSupplier();
-                supllierMenu();
                 break;
             case 2:
                 deleteSupplier();
-                supllierMenu();
                 break;
             case 3:
                 System.out.println("Enter Number Of Suppliers:");
                 int cntr = input.nextInt();
                 input.nextLine();
                 addSupplier(cntr);
+                break;
+            case 4:
+                updateSupplierPhone();
+                break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
                 break;
@@ -83,9 +89,7 @@ public class AdminINF {
 
     static void deleteSupplier() {
 
-        System.out.println("----------------------------------");
         Supplier.showAll();
-        System.out.println("----------------------------------");
 
         System.out.print("Enter Supplier ID: ");
         int id = input.nextInt();
@@ -103,6 +107,31 @@ public class AdminINF {
             System.out.println("No Such Supplier");
     }
 
+    // UPATE SUPPLIER PHONE
+    static void updateSupplierPhone() {
+        Supplier.showAll();
+
+        System.out.print("Enter Supplier ID: ");
+        int id = input.nextInt();
+        input.nextLine();
+
+        if (Admin.checkSupllierId(id)) {
+            Supplier.show(id);
+            System.out.print("Enter New Email: ");
+            String email = input.nextLine();
+            if (Admin.updateSupplierEmail(id, email)) {
+                Supplier.show(id);
+                System.out.println("DONE");
+
+            } else {
+                System.out.println("Somthing Went Wrong");
+            }
+        } else
+            System.out.println("No Such Supplier");
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------
+
     // PROUCT MENU
     static void productMenu() {
         System.out.println("\nProduct Menu:");
@@ -119,26 +148,25 @@ public class AdminINF {
         switch (choice) {
             case 1:
                 addProduct();
-                productMenu(); // Return to product menu after action
+                // productMenu();
                 break;
             case 2:
                 deleteProduct();
-                productMenu(); // Return to product menu after action
+                // productMenu();
                 break;
             // case 3:
             // updateProduct();
-            // productMenu(); // Return to product menu after action
+            // productMenu();
             // break;
             // case 4:
             // displayAllProducts();
-            // productMenu(); // Return to product menu after action
+            // productMenu();
             // break;
             case 5:
-                setVisible(); // Return to the main admin menu
+                setVisible();
                 break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
-                productMenu(); // Retry on invalid input
                 break;
         }
     }

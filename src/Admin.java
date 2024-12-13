@@ -103,6 +103,22 @@ public class Admin {
         }
     }
 
+    // UPDATE SUPPLIER EMAIL
+    public static boolean updateSupplierEmail(int id, String email) {
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement stmt = conn.prepareStatement("UPDATE supplier SET email = ? WHERE id = ?")) {
+
+            stmt.setString(1, email);
+            stmt.setInt(2, id);
+
+            // ResultSet rs = stmt.executeQuery();
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
     // -------------------------------------------->ProductSection<----------------------------------------------
 
     // ADD PRODUCT ---> DONE
@@ -146,6 +162,24 @@ public class Admin {
         }
     }
 
+    // UPDATE PRODUCT BY OPTION PRICE || QUANTITY ---> DONE
+    public static boolean updateProduct(int id, double x, String option) {
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement stmt = conn.prepareStatement("UPDATE product SET " + option + " = ? WHERE id = ?")) {
+
+            // stmt.setString(1, option);
+            stmt.setDouble(1, x);
+            stmt.setInt(2, id);
+
+            // ResultSet rs = stmt.executeQuery();
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
     // public static int getQuantity(int prouctId) {
 
     // String sql = "SELECT quantity FROM product WHERE id = ?";
@@ -164,5 +198,9 @@ public class Admin {
     // return -1;
     // }
     // }
-
+    public static void main() {
+        // Product.showProuct(7001);
+        // updateProduct(7001, 70, "quantity");
+        // Product.showProuct(7001);
+    }
 }
