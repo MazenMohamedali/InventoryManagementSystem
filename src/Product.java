@@ -51,7 +51,8 @@ public class Product {
     Product() {
     }
 
-    Product(int id, String name, double price, int initialQuantity, int supplierID, String category, String exDate, String proDate) {
+    Product(int id, String name, double price, int initialQuantity, int supplierID, String category, String exDate,
+            String proDate) {
         setName(name);
         setPrice(price);
         setQuantity(initialQuantity);

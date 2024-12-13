@@ -233,7 +233,7 @@ public class Client extends Person
             //TODO DB interactions
       }
 
-      public static void updateData(Client c, int id)
+      public static void updateData(Client c)
       {
 
             String sql = "UPDATE client SET name = ?, email = ?, address = ?, password = ?, balance = ? WHERE id = ?";
@@ -248,7 +248,7 @@ public class Client extends Person
                         pstmt.setString(3, c.getAddress());
                         pstmt.setString(4, c.getPassword());
                         pstmt.setBigDecimal(5, BigDecimal.valueOf(c.balance));
-                        pstmt.setInt(6, id);
+                        pstmt.setInt(6, c.id);
                         pstmt.executeUpdate();
                         System.out.println("Client data updated successfully.");
                   }
