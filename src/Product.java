@@ -1,10 +1,6 @@
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.YearMonth;
 import java.util.Locale;
 
@@ -229,6 +225,54 @@ public class Product {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
         }
     }
+
+    public static void printLine()
+    {
+        System.out.println("-------------------------------------------------------------------------------------------------------------------------");
+    }
+
+    public static void showAllforClient()
+    {
+        try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+             PreparedStatement stmt = conn.prepareStatement("SELECT name, price, quantity, productionDate, expireDate FROM product")) 
+        {
+            ResultSet rs = stmt.executeQuery();
+            
+            printLine();
+            System.out.println("Name\t\t|\tPrice\t\t|\tQuantity\t|\tProductionDate\t\t|\tExpireDate\t|");
+            printLine();
+            while (rs.next()) 
+            {
+                String name = rs.getString(1);
+                double price = rs.getDouble(2);
+                int quantity = rs.getInt(3);
+                String productionDate = rs.getString(4);
+                String expireDate = rs.getString(5);
+                System.out.println(name + "\t\t|\t" + price + "\t\t|\t" + quantity + "\t\t|\t" + productionDate + "\t\t|\t" + expireDate + "\t|");
+                printLine();
+            }
+
+        } catch (SQLException e) {
+            System.out.println("SOMTHING WENT WRONG" + e.getMessage());
+        }
+    }
+    
+
+/*   THIS WORKS BUT WITHOUT VERTICAL SEPARATORS
+
+System.out.println("Name\t\tPrice\t\tQuantity\tProductionDate\t\tExpireDate");
+printLine();
+while (rs.next()) 
+{
+    String name = rs.getString(1);
+    double price = rs.getDouble(2);
+    int quantity = rs.getInt(3);
+    String productionDate = rs.getString(4);
+    String expireDate = rs.getString(5);
+    System.out.println(name + "\t\t" + price + "\t\t" + quantity + "\t\t" + productionDate + "\t\t" + expireDate);
+    printLine();
+}
+*/
 
     static void showProuct(int id) {
 
