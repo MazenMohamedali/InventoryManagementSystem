@@ -31,7 +31,7 @@ public class Client extends person {
       private static int orderCount;
       public double balance = 0;
       public int id = startID;
-      private ArrayList<String> phoneNumbers = new ArrayList<String>();
+      public ArrayList<String> phoneNumbers = new ArrayList<String>();
 
       public Client() {
       }
@@ -43,7 +43,8 @@ public class Client extends person {
             phoneNumbers.add(phone_no);
       }
 
-      public static void addToClientTable(Client c) {
+      public static void addToClientTable(Client c) 
+      {
             String sql = "INSERT INTO client (id, name, email, address, password, balance) VALUES (?, ?, ?, ?, ?, ?)";
             String maxIDQuery = "SELECT MAX(id) AS max_id FROM client";
             try (Connection conn = DriverManager.getConnection(DB_URL)) {
@@ -51,17 +52,22 @@ public class Client extends person {
 
                   // Retrieve the current max ID
                   try (Statement maxIDStatement = conn.createStatement();
-                              ResultSet rs = maxIDStatement.executeQuery(maxIDQuery)) {
+                              ResultSet rs = maxIDStatement.executeQuery(maxIDQuery)) 
+                  {
                         int max_ID;
                         rs.next();
-                        if (rs.getInt(1) == 0) {
+                        if (rs.getInt(1) == 0) 
+                        {
                               max_ID = startID;
-                        } else {
+                        } 
+                        else 
+                        {
                               max_ID = rs.getInt("max_id");
                         }
 
                         // Insert into the client table
-                        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                        try (PreparedStatement pstmt = conn.prepareStatement(sql)) 
+                        {
                               pstmt.setInt(1, max_ID + 1);
                               pstmt.setString(2, c.getName());
                               pstmt.setString(3, c.getEmail());
@@ -80,19 +86,21 @@ public class Client extends person {
                   }
             } catch (SQLException e) {
                   System.out.println("Error: " + e.getMessage());
-                  e.printStackTrace();
             }
       }
 
-      public static void addPhoneNumber(Connection conn, int id, String phone) {
-            try (PreparedStatement pstmt = conn
-                        .prepareStatement("INSERT INTO phone_numbers (id, phone_number) VALUES (?,?)")) {
+      public static void addPhoneNumber(Connection conn, int id, String phone) 
+      {
+            try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO phone_numbers (id, phone_number) VALUES (?,?)")) 
+            {
                   pstmt.setInt(1, id);
                   pstmt.setString(2, phone);
 
                   pstmt.executeUpdate();
                   // log the operation
-            } catch (SQLException e) {
+            } 
+            catch (SQLException e) 
+            {
                   System.out.println(e.getMessage());
                   // log the error
             }
@@ -110,7 +118,8 @@ public class Client extends person {
             return orderCount;
       }
 
-      public static ArrayList<String> getPhoneNumbers(int id) {
+      public static ArrayList<String> getPhoneNumbers(int id) 
+      {
             ArrayList<String> ans = new ArrayList<String>();
             String sql = "SELECT phone_number FROM phone_numbers where id = ?";
             try (Connection conn = DriverManager.getConnection(DB_URL);
@@ -157,9 +166,10 @@ public class Client extends person {
 
       public static int getID(String email) {
             int id = -1;
-            String sql = "SELECT * FROM client WHERE email = '?'";
+            String sql = "SELECT id FROM client WHERE email = ?";
             try (Connection conn = DriverManager.getConnection(DB_URL)) {
                   PreparedStatement p = conn.prepareStatement(sql);
+                  p.setString(1, email);
                   ResultSet rs = p.executeQuery();
 
                   if (rs.next()) {
@@ -176,11 +186,13 @@ public class Client extends person {
       }
 
       public static boolean exists(String table, String column, String value) {
-            String sql = "SELECT * FROM " + table + " WHERE " + column + " = ?";
+            String sql = "SELECT " + column + " FROM " + table + " WHERE " + column + " = ?";
             boolean result = false;
-            try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
-                        PreparedStatement statement = connection.prepareStatement(sql)) {
-                  ResultSet rs = statement.executeQuery(sql);
+            try (Connection connection = DriverManager.getConnection(DB_URL);
+                 PreparedStatement statement = connection.prepareStatement(sql)) 
+            {
+                  statement.setString(1, value);
+                  ResultSet rs = statement.executeQuery();
                   while (rs.next()) {
                         result = value.equals(rs.getString(column));
                         if (result == true) {
@@ -235,28 +247,45 @@ public class Client extends person {
             // TODO DB interactions
       }
 
-      public static void updatePhoneNumber(int id, String oldPhoneNumber, String newPhoneNumber) {
-            String sql = "UPDATE phone_numbers SET ? = ?  WHERE id = ?";
+      public static void updatePhoneNumber(int id, String oldPhoneNumber, String newPhoneNumber) 
+      {
+            String sql = "UPDATE phone_numbers SET phone_number = ?  WHERE id = ?;";
             try (Connection conn = DriverManager.getConnection(DB_URL);
-                        PreparedStatement p = conn.prepareStatement(sql)) {
-                  if (!exists("phone_numbers", "phone_number", newPhoneNumber)) {
-                        conn.setAutoCommit(false);
-                        p.setInt(1, id);
-                        p.setString(2, oldPhoneNumber);
-                        p.setString(3, newPhoneNumber);
+                 PreparedStatement p = conn.prepareStatement(sql)) 
+            {
+                  if (!exists("phone_numbers", "phone_number", newPhoneNumber)) 
+                  {
+                        p.setString(1, newPhoneNumber);
+                        p.setInt(2, id);
                         p.executeUpdate();
                   }
+            } 
+            catch (SQLException e) 
+            {
+                  e.printStackTrace();
+            }
+      }
+
+      public static void updateRow(String table, String column, int id, String newVal)
+      {
+            String sql = "UPDATE " + table + " SET " + column + " = ? WHERE id = ?";
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
+                  PreparedStatement pstmt = conn.prepareStatement(sql);
+                  pstmt.setString(1, newVal);
+                  pstmt.setInt(2, id);
+                  pstmt.executeUpdate();
             } catch (SQLException e) {
                   System.out.println(e.getMessage());
             }
       }
 
-      public static void updateData(Client c) {
-
+      public static void updateDatabase(Client c) 
+      {
             String sql = "UPDATE client SET name = ?, email = ?, address = ?, password = ?, balance = ? WHERE id = ?";
             try (Connection conn = DriverManager.getConnection(DB_URL)) {
                   conn.setAutoCommit(false);
-                  try {
+                  try 
+                  {
                         PreparedStatement pstmt = conn.prepareStatement(sql);
                         pstmt.setString(1, c.getName());
                         pstmt.setString(2, c.getEmail());
@@ -266,13 +295,22 @@ public class Client extends person {
                         pstmt.setInt(6, c.id);
                         pstmt.executeUpdate();
                         System.out.println("Client data updated successfully.");
-                  } catch (SQLException e) {
+                  } 
+                  catch (SQLException e) 
+                  {
                         System.out.println("Error: " + e.getMessage());
                         e.printStackTrace();
                   }
                   conn.commit();
-            } catch (SQLException e) {
+            } 
+            catch (SQLException e) 
+            {
                   System.out.println(e.getStackTrace());
             }
+      }
+
+      public static void main(String[] args) {
+            // Usage example
+            System.out.println(Client.exists("client", "name", "x"));
       }
 }
