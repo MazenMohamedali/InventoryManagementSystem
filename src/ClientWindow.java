@@ -21,6 +21,8 @@ public class ClientWindow
             System.out.println("5. Log out");
             System.out.print("Your Choice? ");
             option = in.nextInt();
+            System.out.println("________________________");
+            System.out.println();
             return option;
       }
 
@@ -108,6 +110,7 @@ public class ClientWindow
                         System.out.println("1. Email");
                         System.out.println("2. Phone");
                         System.out.println("3. Password");
+                        System.out.println("5. Add phone number");
                         System.out.print("Your choice? ");
                         choice = in.nextInt();
                         in.nextLine();
@@ -117,7 +120,7 @@ public class ClientWindow
                               System.out.print("Enter your new email address: ");
                               String newEmail = in.next();
                               boolean found;
-                              found = Client.exists("client", "email", client.getEmail());
+                              found = Client.exists("client", "email", newEmail);
                               if(found)
                               {
                                     System.out.println("this email address is already in the database");
@@ -198,7 +201,7 @@ public class ClientWindow
                         break;
                         
                   case 4:
-                        editAccount();
+                        editAccount(10001);
                         break;
                   case 5:
                         System.out.println("Goodbye!");
@@ -210,8 +213,21 @@ public class ClientWindow
             }
       }
       public static void main()
-      {            
-            show();
-            in.close();
+      {
+            try
+            {
+                  Client c = Client.getData(10001);
+                  System.out.println(c.getName() + " " + Client.getID("fake@gmail.com")+ " " + c.getEmail() + " " + c.getAddress() + " " + c.getPassword() + " " + c.getBalance());
+                  for(var i : Client.getPhoneNumbers(10001))
+                  {
+                        System.out.println(i);
+                  }         
+                  show();
+                  in.close();
+            }
+            catch (SQLException e)
+            {
+                  e.printStackTrace();
+            }
       }
 }
