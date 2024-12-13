@@ -1,11 +1,9 @@
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -309,8 +307,8 @@ public class Client extends person {
             }
       }
 
-      public static void main(String[] args) {
+/*       public static void main(String[] args) {
             // Usage example
             System.out.println(Client.exists("client", "name", "x"));
-      }
+      } */
 }

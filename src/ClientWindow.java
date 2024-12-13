@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ClientWindow 
+public class ClientWindow //TODO shit spazes out when you enter a string instead of a number
 {
       static Scanner in = new Scanner(System.in);
       public static int getOption(int id)
@@ -32,36 +32,47 @@ public class ClientWindow
       }
 
 
+      public static void viewProducts()//TODO "Warning: products such and such are nearing the expiry date
+      {
+            Product.showAllforClient();
+            printSeparator();
+      } 
 
-      public static void createOrder()
+
+      public static void createOrder()//TODO finish prompts
       {
             
             ArrayList<String> productNames = new ArrayList<String>();
 
-            while(true)
+            String temp = "";
+            while(!temp.equalsIgnoreCase("exit"))
             {
-                  System.out.print("Please enter the product's name (enter 'exit' to finish): ");
-                  String temp = in.next();
-                  System.out.println('\n');
-                  if(!temp.equalsIgnoreCase("exit"))
+                  System.out.print("Please enter a product's name (enter 'exit' to finish): ");
+                  temp = in.next();
+
+                  
+                  if(!temp.equalsIgnoreCase("exit") & !productNames.contains(temp))
                   {
                         productNames.add(temp);
                   }
-                  else
+                  else if(productNames.contains(temp))
                   {
-                        break;
+                        printSeparator();
+                        System.out.println("this product has already been enterd");
+                        printSeparator();
                   }
             }
             
             int[] amounts = new int[productNames.size()];
+            printSeparator();
             System.out.println("Please enter the amount of each product:");
             for(int i = 0; i < productNames.size(); i++)
             {
-                  System.out.print(i + ". " + productNames.get(i) + ": ");
+                  System.out.print(i + ": " + productNames.get(i) + ": ");
                   
                   amounts[i] = in.nextInt();
             }
-
+            printSeparator();
             System.out.println("You Entered:");
             for(int i = 0; i < productNames.size(); i++)
             {
@@ -81,13 +92,14 @@ public class ClientWindow
             {
                   for(int i = 0; i < productNames.size(); i++)
                   {
-                        System.out.println("\n");
+                        printSeparator();
                         for(int j = 0; j < productNames.size(); j++)
                         {
-                              System.out.println(productNames.get(j) + ": " + amounts[j] + " units");
+                              System.out.println(j + ": " + productNames.get(j) + ": " + amounts[j] + " units");
                         }
-                        System.out.print("\nre-enter the name of the product (enter 'next' to skip this product)" + i + ": ");
-                        String temp = in.next();
+                        System.out.print("\nre-enter the name of the product (enter 'next' to skip this product)\n" + i + ": ");
+                        temp = in.next();
+                        printSeparator();
                         if(temp.equalsIgnoreCase("next"))
                         {
                               continue;
@@ -95,7 +107,9 @@ public class ClientWindow
                         
                         productNames.set(i, temp);
                         System.out.print("Please re-enter the amount of " + productNames.get(i) + ": ");
-                        amounts[i] = in.nextInt();  
+                        amounts[i] = in.nextInt();
+
+                        
                         //TODO update DB
                   }
             }
@@ -328,6 +342,7 @@ public class ClientWindow
                               ClientReport.genReport(id);
                               break;
                         case 3://view products
+                              viewProducts();
                               break;                             
                         case 4://edit account
                               editAccount(id);
