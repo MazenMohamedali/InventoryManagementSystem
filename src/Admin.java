@@ -1,9 +1,5 @@
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Admin {
 
@@ -14,6 +10,7 @@ public class Admin {
     Product product;
     // Report report;
 
+    // --------------------------------------------->SupplierSection<-------------------------------------------------
     // ADD SUPPLIER ---> DONE
     public static boolean addSupplier(Supplier sup) {// NEED Supplier CLASS
 
@@ -91,8 +88,9 @@ public class Admin {
     }
 
     // CHECK IF SUPPLIER ID EXIST ---> DONE
-    public static boolean checkSupllierId(Connection conn, int sup_id) {
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
+    public static boolean checkSupllierId(int sup_id) {
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
 
             stmt.setInt(1, sup_id);
 
@@ -105,28 +103,34 @@ public class Admin {
         }
     }
 
-    // ADD PRODUCT
-    // public void addProduct(Product product) {// NEED Product CLASS
+    // -------------------------------------------->ProductSection<----------------------------------------------
 
-    // String sql = "INSERT INTO supplier (name,price,quantity,category,sup_id)
-    // VALUES(?,?,?,?,?)";
-    // try (Connection conn = DriverManager.getConnection(DB_URL);
-    // PreparedStatement stmt = conn.prepareStatement(sql)) {
+    // ADD PRODUCT ---> DONE
+    public static boolean insertProduct(Product product) {
+        String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate) VALUES (? ,?, ?, ?, ?, ?, ?)";
 
-    // stmt.setString(1, prod.getName());
-    // stmt.setDouble(2, prod.getPrice());
-    // stmt.setInt(3, prod.getQuantity());
-    // // stmt.setString(4, prod.getCategory());
-    // stmt.setInt(5, prod.getSupplierID());
+        try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
+                PreparedStatement statement = connection.prepareStatement(sqlquary)) {
+            statement.setString(1, product.getName());
+            statement.setBigDecimal(2, BigDecimal.valueOf(product.getPrice()));
+            statement.setInt(3, product.getQuantity());
+            statement.setString(4, product.getCategory()); // Set the category
+            if (checkSupllierId(product.getSupplierID())) {
+                statement.setInt(5, product.getSupplierID());
+            } else {
+                System.out.println("Supplier id not found");
+            }
+            statement.setString(6, product.getExpirDate()); // Set the expiration date
+            statement.setString(7, product.getProductionDate()); // Set the production date
 
-    // int rowsAffected = stmt.executeUpdate();
-    // System.out.println("RAWS AFFECTED: " + rowsAffected);
-    // } catch (SQLException e) {
-    // System.out.println(e.getMessage());
-    // }
-    // }
+            return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
-    // Delete Product
+    // DELETE PRODUCT ---> DONE
     public static boolean deleteProduct(int prouctId) {
 
         String sql = "DELETE FROM product WHERE id = ?";
@@ -142,61 +146,23 @@ public class Admin {
         }
     }
 
-    // Mazen Add Product
-    public static boolean insertProduct(Product product) {
-        String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate) VALUES (? ,?, ?, ?, ?, ?, ?)";
+    // public static int getQuantity(int prouctId) {
 
-        try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
-                PreparedStatement statement = connection.prepareStatement(sqlquary)) {
-            statement.setString(1, product.getName());
-            statement.setBigDecimal(2, BigDecimal.valueOf(product.getPrice()));
-            statement.setInt(3, product.getQuantity());
-            statement.setString(4, product.getCategory()); // Set the category
-            if (checkSupllierId(connection, product.getSupplierID())) {
-                statement.setInt(5, product.getSupplierID());
-            } else {
-                System.out.println("Supplier id not found");
-            }
-            statement.setDate(6, new java.sql.Date(product.getExpirDate().getTime())); // Set the expiration date
-            statement.setDate(7, new java.sql.Date(product.getProductionDate().getTime())); // Set the production date
+    // String sql = "SELECT quantity FROM product WHERE id = ?";
+    // try (Connection conn = DriverManager.getConnection(DB_URL);
+    // PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            return statement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    static void updateQuantity() {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement stmt = conn.prepareStatement("DELETE FROM supplier WHERE id = ?")) {
-
-            int rowsAffected = stmt.executeUpdate();
-            System.out.println("RAWS AFFECTED: " + rowsAffected);
-            // return rowsAffected > 0;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            // return false;
-        }
-    }
-
-    public static int getQuantity(int prouctId) {
-
-        String sql = "SELECT quantity FROM product WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, prouctId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("quantity");
-            } else {
-                return -1;
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return -1;
-        }
-    }
+    // stmt.setInt(1, prouctId);
+    // ResultSet rs = stmt.executeQuery();
+    // if (rs.next()) {
+    // return rs.getInt("quantity");
+    // } else {
+    // return -1;
+    // }
+    // } catch (SQLException e) {
+    // System.out.println(e.getMessage());
+    // return -1;
+    // }
+    // }
 
 }

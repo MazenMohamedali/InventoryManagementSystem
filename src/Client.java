@@ -25,54 +25,43 @@ class Order
 }
  */
 
-public class Client extends person 
-{
+public class Client extends person {
       private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
       private static final int startID = 10000;
       private static int orderCount;
       public double balance = 0;
       public int id = startID;
-      private ArrayList <String> phoneNumbers = new ArrayList<String>();
-      
-      
-      public Client(){}
+      private ArrayList<String> phoneNumbers = new ArrayList<String>();
 
-      public Client(String name, String email, String password, String address, String phone_no, double balance)
-      {
+      public Client() {
+      }
+
+      public Client(String name, String email, String password, String address, String phone_no, double balance) {
             super(name, email, phone_no, password, address);
             this.balance = balance;
             this.id = startID;
             phoneNumbers.add(phone_no);
       }
-      
-      
-      
-      public static void addToClientTable(Client c) 
-      {
+
+      public static void addToClientTable(Client c) {
             String sql = "INSERT INTO client (id, name, email, address, password, balance) VALUES (?, ?, ?, ?, ?, ?)";
             String maxIDQuery = "SELECT MAX(id) AS max_id FROM client";
-            try (Connection conn = DriverManager.getConnection(DB_URL)) 
-            {
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
                   conn.setAutoCommit(false); // Enable transaction handling
-                  
+
                   // Retrieve the current max ID
                   try (Statement maxIDStatement = conn.createStatement();
-                  ResultSet rs = maxIDStatement.executeQuery(maxIDQuery)) 
-                  {
+                              ResultSet rs = maxIDStatement.executeQuery(maxIDQuery)) {
                         int max_ID;
                         rs.next();
-                        if (rs.getInt(1) == 0)
-                        {
+                        if (rs.getInt(1) == 0) {
                               max_ID = startID;
-                        }
-                        else
-                        {
+                        } else {
                               max_ID = rs.getInt("max_id");
                         }
-                        
+
                         // Insert into the client table
-                        try (PreparedStatement pstmt = conn.prepareStatement(sql)) 
-                        {
+                        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                               pstmt.setInt(1, max_ID + 1);
                               pstmt.setString(2, c.getName());
                               pstmt.setString(3, c.getEmail());
@@ -81,207 +70,158 @@ public class Client extends person
                               pstmt.setBigDecimal(6, BigDecimal.valueOf(c.balance));
                               pstmt.executeUpdate();
                         }
-                        
+
                         // Add phone number
                         addPhoneNumber(conn, max_ID + 1, c.getPhone_no());
-                        
+
                         // Commit the transaction
                         conn.commit();
                         System.out.println("Client and phone number added successfully.");
                   }
-            } 
-            catch (SQLException e) 
-            {
+            } catch (SQLException e) {
                   System.out.println("Error: " + e.getMessage());
                   e.printStackTrace();
             }
       }
-      
-      
-      
-      
-      
-      
-      public static void addPhoneNumber(Connection conn ,int id, String phone)
-      {
-            try(PreparedStatement pstmt = conn.prepareStatement("INSERT INTO phone_numbers (id, phone_number) VALUES (?,?)"))
-            {
+
+      public static void addPhoneNumber(Connection conn, int id, String phone) {
+            try (PreparedStatement pstmt = conn
+                        .prepareStatement("INSERT INTO phone_numbers (id, phone_number) VALUES (?,?)")) {
                   pstmt.setInt(1, id);
                   pstmt.setString(2, phone);
-                  
+
                   pstmt.executeUpdate();
-                  //log the operation
-            }
-            catch(SQLException e)
-            {
+                  // log the operation
+            } catch (SQLException e) {
                   System.out.println(e.getMessage());
-                  //log the error
+                  // log the error
             }
       }
-      
-      
-      
-      public double getBalance()
-      {
+
+      public double getBalance() {
             return balance;
       }
-      
-      
-      
-      public int getstartID()
-      {
+
+      public int getstartID() {
             return startID;
       }
-      
-      
-      
-      public static int getOrderCount()
-      {
+
+      public static int getOrderCount() {
             return orderCount;
       }
-      
-      
-      public static ArrayList<String> getPhoneNumbers(int id)
-      {
+
+      public static ArrayList<String> getPhoneNumbers(int id) {
             ArrayList<String> ans = new ArrayList<String>();
             String sql = "SELECT phone_number FROM phone_numbers where id = ?";
-            try(Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement p = conn.prepareStatement(sql))
-            {
+            try (Connection conn = DriverManager.getConnection(DB_URL);
+                        PreparedStatement p = conn.prepareStatement(sql)) {
                   p.setInt(1, id);
                   ResultSet rs = p.executeQuery();
-                  while(rs.next())
-                  {
+                  while (rs.next()) {
                         ans.add(rs.getString(1));
                   }
-            }
-            catch(SQLException e)
-            {
+            } catch (SQLException e) {
 
             }
             return ans;
       }
-      
-      public static Client getData(int id) throws SQLException 
-      {
+
+      public static Client getData(int id) throws SQLException {
             Client client = new Client();
             Connection conn = DriverManager.getConnection(DB_URL);
-            String sql = "SELECT name, email, address, balance, password " +
-            "FROM client " +
-            "WHERE client.id = ?";
-            
+            String sql = "SELECT name, id, email, address, balance, password " +
+                        "FROM client " +
+                        "WHERE client.id = ?";
+
             PreparedStatement p = conn.prepareStatement(sql);
             p.setInt(1, id);
             ResultSet rs = p.executeQuery();
             rs.next();
 
             client.setName(rs.getString(1));
-            client.setEmail(rs.getString(2));
-            client.setAddress(rs.getString(3));
-            client.balance = rs.getDouble(4);
-            client.setPassword(rs.getString(5));
-            
+            client.id = rs.getInt(2);
+            client.setEmail(rs.getString(3));
+            client.setAddress(rs.getString(4));
+            client.balance = rs.getDouble(5);
+            client.setPassword(rs.getString(6));
+
             client.phoneNumbers.addAll(getPhoneNumbers(client.id));
-            
+
             rs.close();
             p.close();
             conn.close();
 
             return client;
-            
+
       }
-      public static int getID(String email)
-      {
+
+      public static int getID(String email) {
             int id = -1;
-            String sql = "SELECT * FROM client WHERE email = ?";
-            try(Connection conn = DriverManager.getConnection(DB_URL))
-            {
+            String sql = "SELECT * FROM client WHERE email = '?'";
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
                   PreparedStatement p = conn.prepareStatement(sql);
-                  p.setString(1, email);
                   ResultSet rs = p.executeQuery();
-                  if(rs.next())
-                  {      
+
+                  if (rs.next()) {
                         id = rs.getInt(1);
                   }
 
                   rs.close();
                   p.close();
                   conn.close();
-            }
-            catch(SQLException e)
-            {
+            } catch (SQLException e) {
                   System.out.println(e.getMessage());
             }
             return id;
       }
 
-      public static boolean exists(String table, String column, String value) 
-      {
+      public static boolean exists(String table, String column, String value) {
             String sql = "SELECT * FROM " + table + " WHERE " + column + " = ?";
             boolean result = false;
             try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
-                 PreparedStatement statement = connection.prepareStatement(sql)) 
-            {
-                  statement.setString(1, value);
-                  ResultSet rs = statement.executeQuery();
-                  while(rs.next())
-                  {
+                        PreparedStatement statement = connection.prepareStatement(sql)) {
+                  ResultSet rs = statement.executeQuery(sql);
+                  while (rs.next()) {
                         result = value.equals(rs.getString(column));
-                        if(result == true)
-                        {
+                        if (result == true) {
                               break;
                         }
                   }
-            }
-            catch (SQLException e) 
-            {
-                  e.printStackTrace();
+            } catch (SQLException e) {
+                  System.out.println(e.getMessage());
             }
             return result;
       }
 
-      public static int deletePhoneNumber(int id, String phoneNumber) throws SQLException
-      {
+      public static int deletePhoneNumber(int id, String phoneNumber) throws SQLException {
             int rowsAffected = 0;
             String selectQuery = "select * from phone_numbers where id = ?";
             String deleteQuery = "delete from phone_numbers where id = ? and phone_number = ?";
             ArrayList<String> numbers = new ArrayList<String>();
 
-
-            try(Connection conn = DriverManager.getConnection(DB_URL))
-            {
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
                   conn.setAutoCommit(false);
-                  try (PreparedStatement s = conn.prepareStatement(selectQuery))
-                  {
+                  try (PreparedStatement s = conn.prepareStatement(selectQuery)) {
 
                         s.setInt(1, id);
                         ResultSet rs = s.executeQuery();
-                        
-                        while(rs.next())
-                        {
+
+                        while (rs.next()) {
                               numbers.add(rs.getString(2));
                         }
-                  }
-                  catch(SQLException e)
-                  {
+                  } catch (SQLException e) {
                         System.err.println("cannot establish a connection" + e.getMessage());
                         return 0;
                   }
-                  if(numbers.contains(phoneNumber))
-                  {
-                        try(PreparedStatement d = conn.prepareStatement(deleteQuery))
-                        {
+                  if (numbers.contains(phoneNumber)) {
+                        try (PreparedStatement d = conn.prepareStatement(deleteQuery)) {
                               d.setInt(1, id);
                               d.setString(2, phoneNumber);
                               rowsAffected = d.executeUpdate();
-                        }
-                        catch(SQLException e)
-                        {
+                        } catch (SQLException e) {
                               System.err.println(e.getCause());
                         }
-                  }
-                  else
-                  {
+                  } else {
                         throw new SQLException("phone number does not exist or does not belong to the customer");
                   }
                   conn.commit();
@@ -290,69 +230,49 @@ public class Client extends person
             return rowsAffected;
       }
 
-
-      
-
-      public void placeOrder(int[] orderIDs)
-      {
+      public void placeOrder(int[] orderIDs) {
             orderCount++;
-            //TODO DB interactions
+            // TODO DB interactions
       }
 
-      public static void updatePhoneNumber(int id, String oldPhoneNumber, String newPhoneNumber)
-      {
-            String sql = "UPDATE phone_numbers SET ? = ?  WHERE id = ?"; 
-            try(Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement p = conn.prepareStatement(sql))
-            {
-                  if(!exists("phone_numbers", "phone_number", newPhoneNumber))
-                  {
+      public static void updatePhoneNumber(int id, String oldPhoneNumber, String newPhoneNumber) {
+            String sql = "UPDATE phone_numbers SET ? = ?  WHERE id = ?";
+            try (Connection conn = DriverManager.getConnection(DB_URL);
+                        PreparedStatement p = conn.prepareStatement(sql)) {
+                  if (!exists("phone_numbers", "phone_number", newPhoneNumber)) {
                         conn.setAutoCommit(false);
                         p.setInt(1, id);
                         p.setString(2, oldPhoneNumber);
                         p.setString(3, newPhoneNumber);
                         p.executeUpdate();
                   }
-            }
-            catch(SQLException e)
-            {
+            } catch (SQLException e) {
                   System.out.println(e.getMessage());
             }
       }
-      public static void updateData(Client c) 
-      {
+
+      public static void updateData(Client c) {
+
             String sql = "UPDATE client SET name = ?, email = ?, address = ?, password = ?, balance = ? WHERE id = ?";
-            try (Connection conn = DriverManager.getConnection(DB_URL)) 
-            {
-                  conn.setAutoCommit(false); // Start transaction
-                  try (PreparedStatement pstmt = conn.prepareStatement(sql)) 
-                  {
-                        // Set parameters
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
+                  conn.setAutoCommit(false);
+                  try {
+                        PreparedStatement pstmt = conn.prepareStatement(sql);
                         pstmt.setString(1, c.getName());
                         pstmt.setString(2, c.getEmail());
                         pstmt.setString(3, c.getAddress());
                         pstmt.setString(4, c.getPassword());
-                        pstmt.setBigDecimal(5, BigDecimal.valueOf(c.getBalance()));
+                        pstmt.setBigDecimal(5, BigDecimal.valueOf(c.balance));
                         pstmt.setInt(6, c.id);
-            
-                        // Execute update
                         pstmt.executeUpdate();
-                        conn.commit(); // Commit transaction
                         System.out.println("Client data updated successfully.");
-                  } 
-                  catch (SQLException e) 
-                  {
-                        // Rollback on error
-                        conn.rollback();
-                        System.err.println("Error during update: " + e.getMessage());
+                  } catch (SQLException e) {
+                        System.out.println("Error: " + e.getMessage());
                         e.printStackTrace();
                   }
-            } 
-            catch (SQLException e) 
-            {
-                  System.err.println("Database connection error: " + e.getMessage());
-                  e.printStackTrace();
+                  conn.commit();
+            } catch (SQLException e) {
+                  System.out.println(e.getStackTrace());
             }
       }
 }
-

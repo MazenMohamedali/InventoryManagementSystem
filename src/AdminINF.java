@@ -83,25 +83,34 @@ public class AdminINF {
 
     static void deleteSupplier() {
 
+        System.out.println("----------------------------------");
+        Supplier.showAll();
+        System.out.println("----------------------------------");
+
         System.out.print("Enter Supplier ID: ");
         int id = input.nextInt();
         input.nextLine();
 
-        if (Admin.deleteSupplier(id)) {
-            System.out.println("Supplier has been Deleted");
+        if (Admin.checkSupllierId(id)) {
 
-        } else {
-            System.out.println("Somthing Went Wrong");
-        }
+            if (Admin.deleteSupplier(id)) {
+                System.out.println("Supplier has been Deleted");
+
+            } else {
+                System.out.println("Somthing Went Wrong");
+            }
+        } else
+            System.out.println("No Such Supplier");
     }
 
+    // PROUCT MENU
     static void productMenu() {
         System.out.println("\nProduct Menu:");
         System.out.println("1. Add Product");
         System.out.println("2. Delete Product");
         System.out.println("3. Update Product");
         System.out.println("4. Display All Products");
-        System.out.println("5. Exit to Admin Menu");
+        System.out.println("5. Exit to Main Menu");
         System.out.print("Enter your choice: ");
 
         int choice = input.nextInt();
@@ -134,6 +143,7 @@ public class AdminINF {
         }
     }
 
+    // ADD PRODUCT
     private static void addProduct() {
 
         System.out.print("Enter Product Name: ");
@@ -144,19 +154,19 @@ public class AdminINF {
 
         System.out.print("Enter Product Quantity: ");
         int quantity = input.nextInt();
-        input.nextLine(); // Consume newline character
+        input.nextLine();
 
         System.out.print("Enter Product Category: ");
         String category = input.nextLine();
 
         System.out.print("Enter Supplier ID: ");
         int supplierID = input.nextInt();
-        input.nextLine(); // Consume newline character
+        input.nextLine();
 
-        System.out.print("Enter Expiration Date (yyyy-mm-dd): ");
+        System.out.print("Enter Expiration Date (dd-mm-yyyy): ");
         String expireDateStr = input.nextLine();
 
-        System.out.print("Enter Production Date (yyyy-mm-dd): ");
+        System.out.print("Enter Production Date (dd-mm-yyyy): ");
         String productionDateStr = input.nextLine();
         Product product = new Product(name, price, quantity, supplierID, category, expireDateStr,
                 productionDateStr);
@@ -168,11 +178,18 @@ public class AdminINF {
         }
     }
 
+    // DELETE PRODUCT
     static void deleteProduct() {
+
+        System.out.println("----------------------------------");
+        Product.showAll();
+        System.out.println("----------------------------------");
+
         System.out.print("Enter Product ID to delete: ");
         int id = input.nextInt();
         input.nextLine();
 
+        Product.showProuct(id);
         if (Admin.deleteProduct(id)) {
             System.out.println("Product has been deleted.");
         } else {
