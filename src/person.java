@@ -2,6 +2,7 @@
 public class person {
 
     // datafields
+    private int id;
     private String phone_no;
     private String password;
     private String email;
@@ -23,6 +24,14 @@ public class person {
         this.email = email;
         this.name = name;
         this.address = address;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPhone_no() {

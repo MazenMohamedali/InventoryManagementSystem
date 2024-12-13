@@ -18,37 +18,43 @@ public class AdminINF {
                 break;
             case 1:
                 supllierMenu();
+                break;
             case 2:
                 productMenu();
+                break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
                 break;
         }
     }
 
+    // ###############################################################################################
     static void supllierMenu() {
         System.out.println("\nAdmin Menu:");
         System.out.println("1. Add Supplier");
         System.out.println("2. Delete Supplier");
         System.out.println("3. Add More Than One Supplier");
-        System.out.println("4. Exit");
+        System.out.println("4. Upate Supplier Email");
+        System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
         int choice = input.nextInt();
         input.nextLine();
         switch (choice) {
             case 1:
                 addSupplier();
-                supllierMenu();
                 break;
             case 2:
                 deleteSupplier();
-                supllierMenu();
                 break;
             case 3:
                 System.out.println("Enter Number Of Suppliers:");
                 int cntr = input.nextInt();
                 input.nextLine();
                 addSupplier(cntr);
+                break;
+            case 4:
+                updateSupplierPhone();
+                break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
                 break;
@@ -83,25 +89,57 @@ public class AdminINF {
 
     static void deleteSupplier() {
 
+        Supplier.showAll();
+
         System.out.print("Enter Supplier ID: ");
         int id = input.nextInt();
         input.nextLine();
 
-        if (Admin.deleteSupplier(id)) {
-            System.out.println("Supplier has been Deleted");
+        if (Admin.checkSupllierId(id)) {
 
-        } else {
-            System.out.println("Somthing Went Wrong");
-        }
+            if (Admin.deleteSupplier(id)) {
+                System.out.println("Supplier has been Deleted");
+
+            } else {
+                System.out.println("Somthing Went Wrong");
+            }
+        } else
+            System.out.println("No Such Supplier");
     }
 
+    // UPATE SUPPLIER PHONE
+    static void updateSupplierPhone() {
+        Supplier.showAll();
+
+        System.out.print("Enter Supplier ID: ");
+        int id = input.nextInt();
+        input.nextLine();
+
+        if (Admin.checkSupllierId(id)) {
+            Supplier.show(id);
+            System.out.print("Enter New Email: ");
+            String email = input.nextLine();
+            if (Admin.updateSupplierEmail(id, email)) {
+                Supplier.show(id);
+                System.out.println("DONE");
+
+            } else {
+                System.out.println("Somthing Went Wrong");
+            }
+        } else
+            System.out.println("No Such Supplier");
+    }
+
+    // ------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // PROUCT MENU
     static void productMenu() {
         System.out.println("\nProduct Menu:");
         System.out.println("1. Add Product");
         System.out.println("2. Delete Product");
         System.out.println("3. Update Product");
         System.out.println("4. Display All Products");
-        System.out.println("5. Exit to Admin Menu");
+        System.out.println("5. Exit to Main Menu");
         System.out.print("Enter your choice: ");
 
         int choice = input.nextInt();
@@ -110,30 +148,30 @@ public class AdminINF {
         switch (choice) {
             case 1:
                 addProduct();
-                productMenu(); // Return to product menu after action
+                // productMenu();
                 break;
             case 2:
                 deleteProduct();
-                productMenu(); // Return to product menu after action
+                // productMenu();
                 break;
             // case 3:
             // updateProduct();
-            // productMenu(); // Return to product menu after action
+            // productMenu();
             // break;
             // case 4:
             // displayAllProducts();
-            // productMenu(); // Return to product menu after action
+            // productMenu();
             // break;
             case 5:
-                setVisible(); // Return to the main admin menu
+                setVisible();
                 break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
-                productMenu(); // Retry on invalid input
                 break;
         }
     }
 
+    // ADD PRODUCT
     private static void addProduct() {
 
         System.out.print("Enter Product Name: ");
@@ -144,19 +182,19 @@ public class AdminINF {
 
         System.out.print("Enter Product Quantity: ");
         int quantity = input.nextInt();
-        input.nextLine(); // Consume newline character
+        input.nextLine();
 
         System.out.print("Enter Product Category: ");
         String category = input.nextLine();
 
         System.out.print("Enter Supplier ID: ");
         int supplierID = input.nextInt();
-        input.nextLine(); // Consume newline character
+        input.nextLine();
 
-        System.out.print("Enter Expiration Date (yyyy-mm-dd): ");
+        System.out.print("Enter Expiration Date (dd-mm-yyyy): ");
         String expireDateStr = input.nextLine();
 
-        System.out.print("Enter Production Date (yyyy-mm-dd): ");
+        System.out.print("Enter Production Date (dd-mm-yyyy): ");
         String productionDateStr = input.nextLine();
         Product product = new Product(name, price, quantity, supplierID, category, expireDateStr,
                 productionDateStr);
@@ -168,11 +206,18 @@ public class AdminINF {
         }
     }
 
+    // DELETE PRODUCT
     static void deleteProduct() {
+
+        System.out.println("----------------------------------");
+        Product.showAll();
+        System.out.println("----------------------------------");
+
         System.out.print("Enter Product ID to delete: ");
         int id = input.nextInt();
         input.nextLine();
 
+        Product.showProuct(id);
         if (Admin.deleteProduct(id)) {
             System.out.println("Product has been deleted.");
         } else {

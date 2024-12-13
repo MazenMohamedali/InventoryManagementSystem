@@ -1,60 +1,78 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ClientWindow 
+public class ClientWindow //TODO shit spazes out when you enter a string instead of a number
 {
       static Scanner in = new Scanner(System.in);
-      public static int getOption()
+      public static int getOption(int id)
       {
             int option = -1;
-            System.out.println("WELCOME: ");//TODO get name 
-            System.out.println("please enter a number corresponding to an option:");
-            System.out.println("1. Create an order");
-            System.out.println("2. Create a report");
-            System.out.println("3. View products");
-            System.out.println("4. Edit account");
-            System.out.println("5. Log out");
-            System.out.print("Your Choice? ");
-            option = in.nextInt();
+            try
+            {
+                  Client c = Client.getData(id);
+                  System.out.println("WELCOME: " + c.getName());
+                  System.out.println("please enter a number corresponding to an option:");
+                  System.out.println("1. Create an order");
+                  System.out.println("2. View your report");
+                  System.out.println("3. View products");
+                  System.out.println("4. Edit account");
+                  System.out.println("5. Log out");
+                  System.out.print("Your Choice? ");
+                  option = in.nextInt();
+                  printSeparator();
+            }
+            catch(Exception e)
+            {
+                  e.printStackTrace();
+            }
             return option;
       }
 
 
+      public static void viewProducts()//TODO "Warning: products such and such are nearing the expiry date
+      {
+            Product.showAllforClient();
+            printSeparator();
+      } 
 
-      public static void createOrder()
+
+      public static void createOrder()//TODO finish prompts
       {
             
             ArrayList<String> productNames = new ArrayList<String>();
 
-            while(true)
+            String temp = "";
+            while(!temp.equalsIgnoreCase("exit"))
             {
-                  System.out.print("Please enter the product's name (enter 'exit' to finish): ");
-                  String temp = in.next();
-                  System.out.println('\n');
-                  if(!temp.equalsIgnoreCase("exit"))
+                  System.out.print("Please enter a product's name (enter 'exit' to finish): ");
+                  temp = in.next();
+
+                  
+                  if(!temp.equalsIgnoreCase("exit") & !productNames.contains(temp))
                   {
                         productNames.add(temp);
                   }
-                  else
+                  else if(productNames.contains(temp))
                   {
-                        break;
+                        printSeparator();
+                        System.out.println("this product has already been enterd");
+                        printSeparator();
                   }
             }
             
             int[] amounts = new int[productNames.size()];
+            printSeparator();
             System.out.println("Please enter the amount of each product:");
             for(int i = 0; i < productNames.size(); i++)
             {
-                  System.out.print(i + ". " + productNames.get(i) + ": ");
+                  System.out.print(i + ": " + productNames.get(i) + ": ");
                   
                   amounts[i] = in.nextInt();
             }
-
+            printSeparator();
             System.out.println("You Entered:");
             for(int i = 0; i < productNames.size(); i++)
             {
@@ -68,19 +86,20 @@ public class ClientWindow
             {
                   //TODO update the DB
                   System.out.println("order has been placed! Please check the invoice or report to view the order's details");
-                  System.out.println("_______________________________________________________________");
+                  printSeparator();
             }
             else
             {
                   for(int i = 0; i < productNames.size(); i++)
                   {
-                        System.out.println("\n");
+                        printSeparator();
                         for(int j = 0; j < productNames.size(); j++)
                         {
-                              System.out.println(productNames.get(j) + ": " + amounts[j] + " units");
+                              System.out.println(j + ": " + productNames.get(j) + ": " + amounts[j] + " units");
                         }
-                        System.out.print("\nre-enter the name of the product (enter 'next' to skip this product)" + i + ": ");
-                        String temp = in.next();
+                        System.out.print("\nre-enter the name of the product (enter 'next' to skip this product)\n" + i + ": ");
+                        temp = in.next();
+                        printSeparator();
                         if(temp.equalsIgnoreCase("next"))
                         {
                               continue;
@@ -88,49 +107,129 @@ public class ClientWindow
                         
                         productNames.set(i, temp);
                         System.out.print("Please re-enter the amount of " + productNames.get(i) + ": ");
-                        amounts[i] = in.nextInt();  
+                        amounts[i] = in.nextInt();
+
+                        
                         //TODO update DB
                   }
-
             }
       }
 
+      public static void addAccount()
+      {
+            printSeparator();
+            System.out.print("Enter your name: ");
+            String name = in.next();
+            
 
+            String email = "";
+            boolean exists = true;
+            while(exists)
+            {
+                  System.out.print("Enter your email: ");
+                  email = in.next();
+                  exists = Client.exists("client", "email", email);
+                  if(exists)
+                  {
+                        System.out.println("Email already exists, enter a different one");
+                        printSeparator();
+                  }
+                  else
+                  {
+                        exists = false;
+                  }
+            }   
+            
+            
+            String phone = "";
+            exists = true;
+            while(exists)
+            {
+                  System.out.print("Enter your phone number: ");
+                  phone = in.next();
+                  exists = Client.exists("phone_numbers", "phone_number", phone);
+                  if(exists)
+                  {
+                        System.out.println("Phone number already exists, enter a different one");
+                        printSeparator();
+                  }
+                  else
+                  {
+                        exists = false;
+                  }
+            }
+            
+            
+            String password = "";
+            boolean confirmed = false;
+            while(!confirmed)
+            {
+                  System.out.print("Enter your password: ");
+                  password = in.next();
+                  System.out.print("Confirm your password: ");
+                  String confirmPassword = in.next();
+                  if(confirmPassword.equals(password))
+                  {
+                        confirmed = true;
+                  }
+                  else
+                  {
+                        System.out.println("Passwords do not match");
+                  }
+            }
+
+
+            System.out.println("Enter your address");
+            String address = in.next();
+
+            Client c = new Client(name, email, password, address, phone, 0);
+            Client.addToClientTable(c);
+            printSeparator();
+            System.out.println("You have been added successfully!!");
+            show(Client.getID(email));
+
+            
+            System.out.print("Enter your address: ");
+      }
 
       public static void editAccount(int id)
       {
             try 
             {
                   int choice = 0;          
-                  ArrayList<Client> client = Client.getData(id);
+                  Client client = Client.getData(id);
                   do
                   {
-                        System.out.println("What would you like to change (enter 0 to exit)?");
-                        System.out.println("1. Email");
-                        System.out.println("2. Phone");
-                        System.out.println("3. Password");
+                        System.out.println("id: " + client.id);
+                        System.out.println("Name: " + client.getName());
+                        System.out.println("Email: " + client.getEmail());
+                        System.out.println("Phone numbers: ");
+                        int count = 0;
+                        for(String phone : client.phoneNumbers)
+                        {
+                              System.out.print(count + 1 + phone + "\n");
+                              count++;
+                        }
+                        System.out.println("Address: " + client.getAddress());
+                        System.out.println("Balance: " + client.getBalance());
+                        printSeparator();
+                        System.out.println("What would you like to change? enter a number corresponding to a choice (enter 0 to exit)");
+                        System.out.println("1.Change Email");
+                        System.out.println("2.Change Phone");
+                        System.out.println("3.Change Password");
+                        System.out.println("4.Add phone number");
+                        System.out.println("5.Add balance");
                         System.out.print("Your choice? ");
                         choice = in.nextInt();
+                        printSeparator();
                         in.nextLine();
                         
-                        if(choice == 1)
+                        if(choice == 1)//email
                         {
                               System.out.print("Enter your new email address: ");
-                              String newEmail = in.nextLine();
-                              Connection conn = DriverManager.getConnection(connectDB.getDburl());
-                              PreparedStatement p = conn.prepareStatement("SELECT email FROM client WHERE email = ?");
-                              p.setString(1, newEmail);
-                              ResultSet rs = p.executeQuery();
-                              boolean found = false;
-                              while(rs.next())
-                              {
-                                    String foundEmail = rs.getString(1);
-                                    if(foundEmail.equals(newEmail))
-                                    {
-                                          found = true;
-                                          break;
-                                    }
-                              }
+                              String newEmail = in.next();
+                              boolean found;
+                              found = Client.exists("client", "email", newEmail);
                               if(found)
                               {
                                     System.out.println("this email address is already in the database");
@@ -138,31 +237,28 @@ public class ClientWindow
                               }
                               else
                               {
-                                    for(var i : client)
-                                    {
-                                          i.setEmail(newEmail);
-                                    }
+                                    client.setEmail(newEmail);                                    
+                                    System.out.println("email updated successfully!!");
                               }
-                              conn.close();
                         }
-                        else if(choice == 2)
+                        else if(choice == 2)//phone
                         {
                               System.out.print("Enter your new phone number: ");
                               String newNumber = in.next();
-                              Connection conn = DriverManager.getConnection(connectDB.getDburl());
-                              PreparedStatement p = conn.prepareStatement("SELECT phone_number FROM phone_numbers WHERE phone_number = ?");
-                              p.setString(1, newNumber);
-                              ResultSet rs = p.executeQuery();
-                              boolean found = false;
-                              while(rs.next())
+                              System.out.println("");
+
+                              var phoneNumbers = Client.getPhoneNumbers(id);
+                              System.out.println("the phone numbers you currently have:");
+                              
+                              for(int i = 0; i < phoneNumbers.size(); i++)
                               {
-                                    String foundNumber = rs.getString(1);
-                                    if(foundNumber.equals(newNumber))
-                                    {
-                                          found = true;
-                                          break;
-                                    }
+                                    System.out.println(i + ": " + phoneNumbers.get(i));
                               }
+
+                              System.out.println("\nWhich phone number would you like to change(enter the number before the ':')? ");
+                              int ans = in.nextInt();
+
+                              boolean found = Client.exists("phone_numbers", "phone_number", newNumber); 
                               if(found)
                               {
                                     System.out.println("this phone number is already in the database");
@@ -170,33 +266,58 @@ public class ClientWindow
                               }
                               else
                               {
-                                    for(var i : client)
-                                    {
-                                          i.setPhone_no(newNumber);
-                                    }
+                                    Client.updatePhoneNumber(client.id, phoneNumbers.get(ans), newNumber);                                
+                                    System.out.println("phone number updated successfully!!");
                               }
-                              conn.close();
                         }
-                        else if(choice == 3)
+                        else if(choice == 3)//password
                         {
                               System.out.println("Please enter your password: ");
                               String password = in.next();
-                              if(client.get(0).getPassword() == password)
+                              if(client.getPassword().equals(password))
                               {
                                     System.out.println("Please enter the new password:");
                                     String newPassword = in.next();
-                                    client.get(0).setPassword(newPassword);
+                                    client.setPassword(newPassword);
                                     System.out.println("Password updated successfully!");
                               }
-                              break;
+                              else
+                              {
+                                    System.out.println("Incorrect password");
+                                    continue;
+                              }
+                        }
+                        else if(choice == 4)//add phone
+                        {
+                              System.out.print("Please enter the phone number you wish to add: ");
+                              String newNumber = in.next();
+                              
+                              boolean found = Client.exists("phone_numbers", "phone_number", newNumber);
+                              if(found == false)
+                              {
+                                    client.phoneNumbers.add(newNumber);
+                                    try(Connection conn = DriverManager.getConnection(connectDB.getDburl()))
+                                    {
+                                          Client.addPhoneNumber(conn, id, newNumber);
+                                    }
+                              }
+                              else
+                              {
+                                    System.out.println("Number already exists");
+                              }
+                        }
+                        else if(choice == 5)//add balance
+                        {
+                              System.out.print("Please enter the amount to add: ");
+                              double amount = in.nextDouble();
+                              client.balance += amount;
                         }
       
                   }while(choice != 0);
                   
-                  for(Client c : client)
-                  {
-                        Client.updateData(c);
-                  }
+                  Client.updateDatabase(client);
+                  printSeparator();
+
             } 
             catch (SQLException e) 
             {
@@ -205,34 +326,50 @@ public class ClientWindow
       }
 
 
-      public static void show()
+      public static void show(int id)
       {
-            int option = getOption();
-            switch (option) 
+            boolean exit = false;
+            while(exit != true)
             {
-                  case 1:
-                        createOrder();
-                        break;
-                  case 2:
-                        break;
-                  case 3:
-                        break;
-                        
-                  case 4:
-                        editAccount();
-                        break;
-                  case 5:
-                        System.out.println("Goodbye!");
-                        System.exit(0);
-                        break;
-                  default:
-                        System.out.println("Invalid option. Please try again.");
-                        break;
+
+                  int option = getOption(id);
+                  switch (option) 
+                  {
+                        case 1://create order
+                              createOrder();
+                              break;
+                        case 2://view report
+                              ClientReport.genReport(id);
+                              break;
+                        case 3://view products
+                              viewProducts();
+                              break;                             
+                        case 4://edit account
+                              editAccount(id);
+                              break;
+                        case 5://log out
+                              System.out.println("Goodbye!");
+                              exit = true;
+                              break;
+                        default:
+                              System.out.println("Invalid option. Please try again.");
+                              break;
+                  }
             }
       }
-      public static void main()
-      {            
-            show();
-            in.close();
+
+      public static void printSeparator()
+      {
+            System.out.println();
+            System.out.println("_______________________________");
+            System.out.println();
       }
+
+
+      public static void main()
+      {
+            show(10102);
+      }
+
+      
 }

@@ -6,6 +6,34 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Admin",
+      "request": "launch",
+      "mainClass": "Admin",
+      "projectName": "InventoryManagementSystem_7b9eace0"
+    },
+    {
+      "type": "java",
+      "name": "Supplier",
+      "request": "launch",
+      "mainClass": "Supplier",
+      "projectName": "InventoryManagementSystem_7b9eace0"
+    },
+    {
+      "type": "java",
+      "name": "ClientWindow",
+      "request": "launch",
+      "mainClass": "ClientWindow",
+      "projectName": "InventoryManagementSystem_7b9eace0"
+    },
+    {
+      "type": "java",
+      "name": "Client",
+      "request": "launch",
+      "mainClass": "Client",
+      "projectName": "InventoryManagementSystem_a0fdde6c"
+    },
+    {
+      "type": "java",
       "name": "ClientWindow",
       "request": "launch",
       "mainClass": "ClientWindow",
