@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -23,21 +25,24 @@ class Order
 }
  */
 
-public class Client extends Person 
+public class Client extends person 
 {
       private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
       private static final int startID = 10000;
       private static int orderCount;
       public double balance = 0;
       public int id = startID;
+      private ArrayList <String> phoneNumbers = new ArrayList<String>();
       
       
-      
+      public Client(){}
+
       public Client(String name, String email, String password, String address, String phone_no, double balance)
       {
             super(name, email, phone_no, password, address);
             this.balance = balance;
             this.id = startID;
+            phoneNumbers.add(phone_no);
       }
       
       
@@ -136,45 +141,104 @@ public class Client extends Person
       }
       
       
-      
-      
-      public static ArrayList<Client> getData(int id) throws SQLException 
+      public static ArrayList<String> getPhoneNumbers(int id)
       {
+            ArrayList<String> ans = new ArrayList<String>();
+            String sql = "SELECT phone_number FROM phone_numbers where id = ?";
+            try(Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement p = conn.prepareStatement(sql))
+            {
+                  p.setInt(1, id);
+                  ResultSet rs = p.executeQuery();
+                  while(rs.next())
+                  {
+                        ans.add(rs.getString(1));
+                  }
+            }
+            catch(SQLException e)
+            {
+
+            }
+            return ans;
+      }
+      
+      public static Client getData(int id) throws SQLException 
+      {
+            Client client = new Client();
             Connection conn = DriverManager.getConnection(DB_URL);
-            String sql = "SELECT client.name, client.id, phone_numbers.phone_number, client.email, client.address, client.balance, password " +
-            "FROM client " + 
-            "JOIN phone_numbers " + 
-            "ON client.id = phone_numbers.id " + 
+            String sql = "SELECT name, id, email, address, balance, password " +
+            "FROM client " +
             "WHERE client.id = ?";
             
             PreparedStatement p = conn.prepareStatement(sql);
             p.setInt(1, id);
             ResultSet rs = p.executeQuery();
+            rs.next();
+
+            client.setName(rs.getString(1));
+            client.id = rs.getInt(2);
+            client.setEmail(rs.getString(3));
+            client.setAddress(rs.getString(4));
+            client.balance = rs.getDouble(5);
+            client.setPassword(rs.getString(6));
             
-            
-            // Initialize arraylist with `Client` objects
-            var data = new ArrayList<Client>();
-            while (rs.next()) 
-            {
-                  Client client = new Client("", "", "", "", "", 0);
-                  client.setName(rs.getString(1));
-                  client.id = rs.getInt(2);
-                  client.setPhone_no(rs.getString(3)); 
-                  client.setEmail(rs.getString(4));
-                  client.setAddress(rs.getString(5));
-                  client.balance = rs.getDouble(6);
-                  client.setPassword(rs.getString(7));
-                  
-                  data.add(client); // Assign the object to the array
-            }
+            client.phoneNumbers.addAll(getPhoneNumbers(client.id));
             
             rs.close();
             p.close();
             conn.close();
+
+            return client;
             
-            return data;
+      }
+      public static int getID(String email)
+      {
+            int id = -1;
+            String sql = "SELECT * FROM client WHERE email = '?'";
+            try(Connection conn = DriverManager.getConnection(DB_URL))
+            {
+                  PreparedStatement p = conn.prepareStatement(sql);
+                  ResultSet rs = p.executeQuery();
+                  
+                  if(rs.next())
+                  {      
+                        id = rs.getInt(1);
+                  }
+
+                  rs.close();
+                  p.close();
+                  conn.close();
+            }
+            catch(SQLException e)
+            {
+                  System.out.println(e.getMessage());
+            }
+            return id;
       }
 
+      public static boolean exists(String table, String column, String value) 
+      {
+            String sql = "SELECT * FROM " + table + " WHERE " + column + " = ?";
+            boolean result = false;
+            try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
+                 PreparedStatement statement = connection.prepareStatement(sql)) 
+            {
+                  ResultSet rs = statement.executeQuery(sql);
+                  while(rs.next())
+                  {
+                        result = value.equals(rs.getString(column));
+                        if(result == true)
+                        {
+                              break;
+                        }
+                  }
+            }
+            catch (SQLException e) 
+            {
+                  System.out.println(e.getMessage());
+            }
+            return result;
+      }
 
       public static int deletePhoneNumber(int id, String phoneNumber) throws SQLException
       {
@@ -227,10 +291,33 @@ public class Client extends Person
       }
 
 
+      
+
       public void placeOrder(int[] orderIDs)
       {
             orderCount++;
             //TODO DB interactions
+      }
+
+      public static void updatePhoneNumber(int id, String oldPhoneNumber, String newPhoneNumber)
+      {
+            String sql = "UPDATE phone_numbers SET ? = ?  WHERE id = ?"; 
+            try(Connection conn = DriverManager.getConnection(DB_URL);
+                PreparedStatement p = conn.prepareStatement(sql))
+            {
+                  if(!exists("phone_numbers", "phone_number", newPhoneNumber))
+                  {
+                        conn.setAutoCommit(false);
+                        p.setInt(1, id);
+                        p.setString(2, oldPhoneNumber);
+                        p.setString(3, newPhoneNumber);
+                        p.executeUpdate();
+                  }
+            }
+            catch(SQLException e)
+            {
+                  System.out.println(e.getMessage());
+            }
       }
 
       public static void updateData(Client c)

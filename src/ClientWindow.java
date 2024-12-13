@@ -15,7 +15,7 @@ public class ClientWindow
             System.out.println("WELCOME: ");//TODO get name 
             System.out.println("please enter a number corresponding to an option:");
             System.out.println("1. Create an order");
-            System.out.println("2. Create a report");
+            System.out.println("2. View your report");
             System.out.println("3. View products");
             System.out.println("4. Edit account");
             System.out.println("5. Log out");
@@ -91,18 +91,17 @@ public class ClientWindow
                         amounts[i] = in.nextInt();  
                         //TODO update DB
                   }
-
             }
       }
 
-
+      
 
       public static void editAccount(int id)
       {
             try 
             {
                   int choice = 0;          
-                  ArrayList<Client> client = Client.getData(id);
+                  Client client = Client.getData(id);
                   do
                   {
                         System.out.println("What would you like to change (enter 0 to exit)?");
@@ -113,24 +112,12 @@ public class ClientWindow
                         choice = in.nextInt();
                         in.nextLine();
                         
-                        if(choice == 1)
+                        if(choice == 1)//email
                         {
                               System.out.print("Enter your new email address: ");
-                              String newEmail = in.nextLine();
-                              Connection conn = DriverManager.getConnection(connectDB.getDburl());
-                              PreparedStatement p = conn.prepareStatement("SELECT email FROM client WHERE email = ?");
-                              p.setString(1, newEmail);
-                              ResultSet rs = p.executeQuery();
-                              boolean found = false;
-                              while(rs.next())
-                              {
-                                    String foundEmail = rs.getString(1);
-                                    if(foundEmail.equals(newEmail))
-                                    {
-                                          found = true;
-                                          break;
-                                    }
-                              }
+                              String newEmail = in.next();
+                              boolean found;
+                              found = Client.exists("client", "email", client.getEmail());
                               if(found)
                               {
                                     System.out.println("this email address is already in the database");
@@ -138,31 +125,25 @@ public class ClientWindow
                               }
                               else
                               {
-                                    for(var i : client)
-                                    {
-                                          i.setEmail(newEmail);
-                                    }
+                                    client.setEmail(newEmail);                                    
+                                    System.out.println("email updated successfully!!");
                               }
-                              conn.close();
                         }
-                        else if(choice == 2)
+                        else if(choice == 2)//phone
                         {
                               System.out.print("Enter your new phone number: ");
                               String newNumber = in.next();
-                              Connection conn = DriverManager.getConnection(connectDB.getDburl());
-                              PreparedStatement p = conn.prepareStatement("SELECT phone_number FROM phone_numbers WHERE phone_number = ?");
-                              p.setString(1, newNumber);
-                              ResultSet rs = p.executeQuery();
-                              boolean found = false;
-                              while(rs.next())
+                              System.out.println("");
+
+                              var phoneNumbers = Client.getPhoneNumbers(id);
+                              System.out.println("the phone numbers you currently have:");
+                              for(int i = 0; i < phoneNumbers.size(); i++)
                               {
-                                    String foundNumber = rs.getString(1);
-                                    if(foundNumber.equals(newNumber))
-                                    {
-                                          found = true;
-                                          break;
-                                    }
+                                    System.out.println(i + ": " + phoneNumbers.get(i));
                               }
+                              System.out.println("\n Which phone number would you like to change(enter the number before the ':')? ");
+                              int ans = in.nextInt();
+                              boolean found = Client.exists("phone_numbers", "phone_number", newNumber); 
                               if(found)
                               {
                                     System.out.println("this phone number is already in the database");
@@ -170,33 +151,31 @@ public class ClientWindow
                               }
                               else
                               {
-                                    for(var i : client)
-                                    {
-                                          i.setPhone_no(newNumber);
-                                    }
+                                    client.setPhone_no(newNumber);
                               }
-                              conn.close();
                         }
-                        else if(choice == 3)
+                        else if(choice == 3)//password
                         {
                               System.out.println("Please enter your password: ");
                               String password = in.next();
-                              if(client.get(0).getPassword() == password)
+                              if(client.getPassword() == password)
                               {
                                     System.out.println("Please enter the new password:");
                                     String newPassword = in.next();
-                                    client.get(0).setPassword(newPassword);
+                                    client.setPassword(newPassword);
                                     System.out.println("Password updated successfully!");
+                              }
+                              else
+                              {
+                                    System.out.println("Incorrect password");
+                                    continue;
                               }
                               break;
                         }
       
                   }while(choice != 0);
                   
-                  for(Client c : client)
-                  {
-                        Client.updateData(c);
-                  }
+                  Client.updateData(client);
             } 
             catch (SQLException e) 
             {
