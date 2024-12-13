@@ -166,7 +166,7 @@ public class Client extends person
       {
             Client client = new Client();
             Connection conn = DriverManager.getConnection(DB_URL);
-            String sql = "SELECT name, id, email, address, balance, password " +
+            String sql = "SELECT name, email, address, balance, password " +
             "FROM client " +
             "WHERE client.id = ?";
             
@@ -176,11 +176,10 @@ public class Client extends person
             rs.next();
 
             client.setName(rs.getString(1));
-            client.id = rs.getInt(2);
-            client.setEmail(rs.getString(3));
-            client.setAddress(rs.getString(4));
-            client.balance = rs.getDouble(5);
-            client.setPassword(rs.getString(6));
+            client.setEmail(rs.getString(2));
+            client.setAddress(rs.getString(3));
+            client.balance = rs.getDouble(4);
+            client.setPassword(rs.getString(5));
             
             client.phoneNumbers.addAll(getPhoneNumbers(client.id));
             
@@ -194,12 +193,12 @@ public class Client extends person
       public static int getID(String email)
       {
             int id = -1;
-            String sql = "SELECT * FROM client WHERE email = '?'";
+            String sql = "SELECT * FROM client WHERE email = ?";
             try(Connection conn = DriverManager.getConnection(DB_URL))
             {
                   PreparedStatement p = conn.prepareStatement(sql);
+                  p.setString(1, email);
                   ResultSet rs = p.executeQuery();
-                  
                   if(rs.next())
                   {      
                         id = rs.getInt(1);
@@ -223,7 +222,8 @@ public class Client extends person
             try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
                  PreparedStatement statement = connection.prepareStatement(sql)) 
             {
-                  ResultSet rs = statement.executeQuery(sql);
+                  statement.setString(1, value);
+                  ResultSet rs = statement.executeQuery();
                   while(rs.next())
                   {
                         result = value.equals(rs.getString(column));
@@ -235,7 +235,7 @@ public class Client extends person
             }
             catch (SQLException e) 
             {
-                  System.out.println(e.getMessage());
+                  e.printStackTrace();
             }
             return result;
       }
@@ -319,36 +319,39 @@ public class Client extends person
                   System.out.println(e.getMessage());
             }
       }
-
-      public static void updateData(Client c)
+      public static void updateData(Client c) 
       {
-
             String sql = "UPDATE client SET name = ?, email = ?, address = ?, password = ?, balance = ? WHERE id = ?";
-            try(Connection conn = DriverManager.getConnection(DB_URL))
+            try (Connection conn = DriverManager.getConnection(DB_URL)) 
             {
-                  conn.setAutoCommit(false);
-                  try
+                  conn.setAutoCommit(false); // Start transaction
+                  try (PreparedStatement pstmt = conn.prepareStatement(sql)) 
                   {
-                        PreparedStatement pstmt = conn.prepareStatement(sql);
+                        // Set parameters
                         pstmt.setString(1, c.getName());
                         pstmt.setString(2, c.getEmail());
                         pstmt.setString(3, c.getAddress());
                         pstmt.setString(4, c.getPassword());
-                        pstmt.setBigDecimal(5, BigDecimal.valueOf(c.balance));
+                        pstmt.setBigDecimal(5, BigDecimal.valueOf(c.getBalance()));
                         pstmt.setInt(6, c.id);
+            
+                        // Execute update
                         pstmt.executeUpdate();
+                        conn.commit(); // Commit transaction
                         System.out.println("Client data updated successfully.");
-                  }
-                  catch (SQLException e)
+                  } 
+                  catch (SQLException e) 
                   {
-                        System.out.println("Error: " + e.getMessage());
+                        // Rollback on error
+                        conn.rollback();
+                        System.err.println("Error during update: " + e.getMessage());
                         e.printStackTrace();
                   }
-                  conn.commit();
-            }
-            catch(SQLException e)
+            } 
+            catch (SQLException e) 
             {
-                  System.out.println(e.getStackTrace());
+                  System.err.println("Database connection error: " + e.getMessage());
+                  e.printStackTrace();
             }
       }
 }
