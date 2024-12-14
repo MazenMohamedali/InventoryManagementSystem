@@ -144,16 +144,8 @@ public class AdminReport {
         
         bw.write("Product ID\t\tQuantity sold\t\tName\t\tPrice\t\tcurrent Quantity\t\tCategory\t\tsup_id\n");
 
-
-
-
-
-        
-
-        
-        
         // file up to date , file is created
-         return true;
+        return true;
         
 
     }
