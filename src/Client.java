@@ -7,21 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//comment Order at actual implementation
-/* 
-class Order
-{
-      int amount;
-      int[] prodID;
-      int[] pricePerID;
-      double[] totalPrice;
-      Date orderDate;
-      Date arrivalDate;
-      public Order(int[] id)
-      {
-      }
-}
+/*TODO
+ * get names
+ * get amounts
+ * UPDATE product SET col_amount = amounts[0,1,2..,i] WHERE product_id, col_name = name, id
+ * SELECT id from product WHERE name = name
+ * col_amounts -= amounts[0,1,2..,i] (decrease amounts of specified products)
+ * log order on orders table
+ * log order on order_prod
+ * save to database
  */
+
 
 public class Client extends person {
       private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
@@ -55,7 +51,7 @@ public class Client extends person {
       }
 
 
-      
+
       public static void addToClientTable(Client c) 
       {
             String sql = "INSERT INTO client (id, name, email, address, password, balance) VALUES (?, ?, ?, ?, ?, ?)";
@@ -253,13 +249,6 @@ public class Client extends person {
                   conn.close();
             }
             return rowsAffected;
-      }
-
-
-
-      public void placeOrder(int[] orderIDs) {
-            orderCount++;
-            // TODO DB interactions
       }
 
 

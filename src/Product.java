@@ -187,6 +187,43 @@ public class Product {
         }
     }
 
+    //get product object by name --> yousf167 <--
+    public static Product getProductIDByName(String value) 
+    {
+        String sqlquery = "SELECT id FROM product WHERE name = ?";
+
+        try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+             PreparedStatement p = conn.prepareStatement(sqlquery)) 
+        {
+
+            p.setString(1, value);
+            ResultSet resultSet = p.executeQuery();
+
+
+
+            if (!resultSet.next()) {
+                return null;
+            } 
+            else 
+            {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                for (int i = 1; i <= columnCount; i++) 
+                {
+                    String columnName = metaData.getColumnName(i);
+                    Object columnValue = resultSet.getObject(i);
+                }
+
+            }
+        } 
+        catch (SQLException e) 
+        {
+            
+        }
+    }
+
+
     public static String searchProductCategory(String productCategory) {
         return search("product", "category", productCategory);
     }
