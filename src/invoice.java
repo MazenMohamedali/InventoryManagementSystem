@@ -1,7 +1,7 @@
 import java.io.*;
 import java.time.LocalDate;
 
-public class invoice extends order {
+public class invoice extends Order {
     int invoiceID;                     
      int[] amount;            
      int[] pricePerproduct;       
