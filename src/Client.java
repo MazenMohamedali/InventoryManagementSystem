@@ -7,21 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-//comment Order at actual implementation
-/* 
-class Order
-{
-      int amount;
-      int[] prodID;
-      int[] pricePerID;
-      double[] totalPrice;
-      Date orderDate;
-      Date arrivalDate;
-      public Order(int[] id)
-      {
-      }
-}
+/*TODO
+ * get names
+ * get amounts
+ * UPDATE product SET col_amount = amounts[0,1,2..,i] WHERE product_id, col_name = name, id
+ * SELECT id from product WHERE name = name
+ * col_amounts -= amounts[0,1,2..,i] (decrease amounts of specified products)
+ * log order on orders table
+ * log order on order_prod
+ * save to database
  */
+
 
 public class Client extends person {
       private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
@@ -40,6 +36,21 @@ public class Client extends person {
             this.id = startID;
             phoneNumbers.add(phone_no);
       }
+      
+
+      public double getBalance() {
+            return balance;
+      }
+
+      public int getstartID() {
+            return startID;
+      }
+
+      public static int getOrderCount() {
+            return orderCount;
+      }
+
+
 
       public static void addToClientTable(Client c) 
       {
@@ -87,6 +98,8 @@ public class Client extends person {
             }
       }
 
+
+
       public static void addPhoneNumber(Connection conn, int id, String phone) 
       {
             try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO phone_numbers (id, phone_number) VALUES (?,?)")) 
@@ -104,17 +117,7 @@ public class Client extends person {
             }
       }
 
-      public double getBalance() {
-            return balance;
-      }
 
-      public int getstartID() {
-            return startID;
-      }
-
-      public static int getOrderCount() {
-            return orderCount;
-      }
 
       public static ArrayList<String> getPhoneNumbers(int id) 
       {
@@ -132,6 +135,8 @@ public class Client extends person {
             }
             return ans;
       }
+
+
 
       public static Client getData(int id) throws SQLException {
             Client client = new Client();
@@ -162,6 +167,8 @@ public class Client extends person {
 
       }
 
+
+
       public static int getID(String email) {
             int id = -1;
             String sql = "SELECT id FROM client WHERE email = ?";
@@ -183,6 +190,8 @@ public class Client extends person {
             return id;
       }
 
+
+
       public static boolean exists(String table, String column, String value) {
             String sql = "SELECT " + column + " FROM " + table + " WHERE " + column + " = ?";
             boolean result = false;
@@ -202,6 +211,8 @@ public class Client extends person {
             }
             return result;
       }
+
+
 
       public static int deletePhoneNumber(int id, String phoneNumber) throws SQLException {
             int rowsAffected = 0;
@@ -240,10 +251,7 @@ public class Client extends person {
             return rowsAffected;
       }
 
-      public void placeOrder(int[] orderIDs) {
-            orderCount++;
-            // TODO DB interactions
-      }
+
 
       public static void updatePhoneNumber(int id, String oldPhoneNumber, String newPhoneNumber) 
       {
@@ -264,6 +272,8 @@ public class Client extends person {
             }
       }
 
+
+
       public static void updateRow(String table, String column, int id, String newVal)
       {
             String sql = "UPDATE " + table + " SET " + column + " = ? WHERE id = ?";
@@ -276,6 +286,8 @@ public class Client extends person {
                   System.out.println(e.getMessage());
             }
       }
+
+
 
       public static void updateDatabase(Client c) 
       {

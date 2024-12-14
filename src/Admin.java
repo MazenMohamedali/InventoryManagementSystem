@@ -88,20 +88,6 @@ public class Admin {
     }
 
     // CHECK IF SUPPLIER ID EXIST ---> DONE
-    public static boolean checkSupllierId(int sup_id) {
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
-
-            stmt.setInt(1, sup_id);
-
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
 
     // UPDATE SUPPLIER EMAIL
     public static boolean updateSupplierEmail(int id, String email) {
@@ -131,8 +117,12 @@ public class Admin {
             statement.setBigDecimal(2, BigDecimal.valueOf(product.getPrice()));
             statement.setInt(3, product.getQuantity());
             statement.setString(4, product.getCategory()); // Set the category
+<<<<<<< HEAD
             statement.setInt(8, product.getPurchasePrecent());
             if (checkSupllierId(product.getSupplierID())) {
+=======
+            if (Supplier.checkSupllierId(product.getSupplierID())) {
+>>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
                 statement.setInt(5, product.getSupplierID());
             } else {
                 System.out.println("Supplier id not found");

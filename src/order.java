@@ -14,14 +14,15 @@ public class Order {
     private final int orderID;       
     private int[] prodID;            
     private int[] amount;            
-    private int[] pricePerID;       
+    private double[] pricePerID;       
     private double totalPrice;       
     private String clientAddress;    
     private LocalDate orderDate;      
     private LocalDate arrivalDate;    
 
-    
-    public Order(int[] prodID, int[] amount, int[] pricePerID, String clientAddress, LocalDate orderDate, LocalDate arrivalDate) {
+
+
+    public Order(int[] prodID, int[] amount, double[] pricePerID, String clientAddress, LocalDate orderDate, LocalDate arrivalDate) {
         this.orderID = idCounter++;  
         this.prodID = prodID;
         this.amount = amount;
@@ -58,11 +59,11 @@ public class Order {
     }
 
     
-    public int[] getPricePerID() {
+    public double[] getPricePerID() {
         return pricePerID;
     }
 
-    public void setPricePerID(int[] pricePerID) {
+    public void setPricePerID(double[] pricePerID) {
         this.pricePerID = pricePerID;
         calculateTotalPrice();
     }
@@ -122,42 +123,42 @@ public class Order {
         }
         System.out.println("Total Price: " + totalPrice);
     }
-}
-public void saveToDatabase() {
-        String insertOrderSQL = "INSERT INTO orders (orderID, clientAddress, orderDate, arrivalDate, totalPrice) VALUES (?, ?, ?, ?, ?)";
-        String insertOrderDetailsSQL = "INSERT INTO order_details (orderID, prodID, amount, pricePerID) VALUES (?, ?, ?, ?)";
-
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            conn.setAutoCommit(false); // Enable transaction
-
-            try (PreparedStatement orderStmt = conn.prepareStatement(insertOrderSQL);
-                 PreparedStatement detailsStmt = conn.prepareStatement(insertOrderDetailsSQL)) {
-
-                // Insert order data
-                orderStmt.setInt(1, orderID);
-                orderStmt.setString(2, clientAddress);
-                orderStmt.setDate(3, java.sql.Date.valueOf(orderDate));
-                orderStmt.setDate(4, java.sql.Date.valueOf(arrivalDate));
-                orderStmt.setDouble(5, totalPrice);
-                orderStmt.executeUpdate();
-
-                // Insert product details
-                for (int i = 0; i < prodID.length; i++) {
-                    detailsStmt.setInt(1, orderID);
-                    detailsStmt.setInt(2, prodID[i]);
-                    detailsStmt.setInt(3, amount[i]);
-                    detailsStmt.setInt(4, pricePerID[i]);
-                    detailsStmt.addBatch(); // Batch processing for efficiency
+    public void saveToDatabase() {
+            String insertOrderSQL = "INSERT INTO orders (orderID, clientAddress, orderDate, arrivalDate, totalPrice) VALUES (?, ?, ?, ?, ?)";
+            String insertOrderDetailsSQL = "INSERT INTO order_details (orderID, prodID, amount, pricePerID) VALUES (?, ?, ?, ?)";
+    
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
+                conn.setAutoCommit(false); // Enable transaction
+    
+                try (PreparedStatement orderStmt = conn.prepareStatement(insertOrderSQL);
+                     PreparedStatement detailsStmt = conn.prepareStatement(insertOrderDetailsSQL)) {
+    
+                    // Insert order data
+                    orderStmt.setInt(1, orderID);
+                    orderStmt.setString(2, clientAddress);
+                    orderStmt.setDate(3, java.sql.Date.valueOf(orderDate));
+                    orderStmt.setDate(4, java.sql.Date.valueOf(arrivalDate));
+                    orderStmt.setDouble(5, totalPrice);
+                    orderStmt.executeUpdate();
+    
+                    // Insert product details
+                    for (int i = 0; i < prodID.length; i++) {
+                        detailsStmt.setInt(1, orderID);
+                        detailsStmt.setInt(2, prodID[i]);
+                        detailsStmt.setInt(3, amount[i]);
+                        detailsStmt.setDouble(4, pricePerID[i]);
+                        detailsStmt.addBatch(); // Batch processing for efficiency
+                    }
+                    detailsStmt.executeBatch();
+    
+                    conn.commit(); // Commit transaction
+                } catch (SQLException e) {
+                    conn.rollback(); // Rollback if any issue occurs
+                    e.printStackTrace();
                 }
-                detailsStmt.executeBatch();
-
-                conn.commit(); // Commit transaction
             } catch (SQLException e) {
-                conn.rollback(); // Rollback if any issue occurs
                 e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-    }
+}
 

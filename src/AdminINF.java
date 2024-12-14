@@ -35,6 +35,7 @@ public class AdminINF {
         System.out.println("2. Delete Supplier");
         System.out.println("3. Add More Than One Supplier");
         System.out.println("4. Upate Supplier Email");
+        System.out.println("5. Show Suppliers");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
         int choice = input.nextInt();
@@ -54,6 +55,9 @@ public class AdminINF {
                 break;
             case 4:
                 updateSupplierPhone();
+                break;
+            case 5:
+                Supplier.showAll();
                 break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
@@ -95,7 +99,7 @@ public class AdminINF {
         int id = input.nextInt();
         input.nextLine();
 
-        if (Admin.checkSupllierId(id)) {
+        if (Supplier.checkSupllierId(id)) {
 
             if (Admin.deleteSupplier(id)) {
                 System.out.println("Supplier has been Deleted");
@@ -115,7 +119,7 @@ public class AdminINF {
         int id = input.nextInt();
         input.nextLine();
 
-        if (Admin.checkSupllierId(id)) {
+        if (Supplier.checkSupllierId(id)) {
             Supplier.show(id);
             System.out.print("Enter New Email: ");
             String email = input.nextLine();
@@ -154,12 +158,14 @@ public class AdminINF {
                 deleteProduct();
                 // productMenu();
                 break;
-            // case 3:
-            // updateProduct();
+            case 3:
+                updateProduct();
+                break;
             // productMenu();
             // break;
-            // case 4:
-            // displayAllProducts();
+            case 4:
+                Product.showAllforClient();
+                break;
             // productMenu();
             // break;
             case 5:
@@ -191,9 +197,16 @@ public class AdminINF {
         int supplierID = input.nextInt();
         input.nextLine();
 
+<<<<<<< HEAD
         System.out.print("Enter Profit ratio ");
         int ProfitRatio = input.nextInt();
         input.nextLine();
+=======
+        if (!Supplier.checkSupllierId(supplierID)) {
+            System.out.println("Supplier id not found");
+            System.exit(1);
+        }
+>>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
 
         System.out.print("Enter Expiration Date (dd-mm-yyyy): ");
         String expireDateStr = input.nextLine();
@@ -227,6 +240,43 @@ public class AdminINF {
         } else {
             System.out.println("Something went wrong or Product ID not found.");
         }
+    }
+
+    // UPDATE PRODUCT
+    static void updateProduct() {
+
+        System.out.println("----------------------------------");
+        Product.showAll();
+        System.out.println("----------------------------------");
+
+        System.out.print("Enter Product ID to update: ");
+        int id = input.nextInt();
+        input.nextLine();
+
+        Product.showProuct(id);
+
+        System.out.print("\n1. PRICE\n2. QUANTITY \nEnter Choice:");
+        int x = input.nextInt();
+        input.nextLine();
+
+        String option;
+        switch (x) {
+            case 1:
+                option = "price";
+                break;
+            case 2:
+                option = "quantity";
+                break;
+            default:
+                System.out.println("Invalid option. Please choose 1 for price or 2 for quantity.");
+                return;
+        }
+
+        System.out.print("Enter new " + option + ": ");
+        int value = input.nextInt();
+        input.nextLine();
+        Admin.updateProduct(id, value, option);
+        Product.showProuct(id);
     }
 
     public static void main() {
