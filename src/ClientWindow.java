@@ -38,6 +38,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
             printSeparator();
       } 
 
+      
 
       public static void createOrder()//TODO finish prompts
       {
