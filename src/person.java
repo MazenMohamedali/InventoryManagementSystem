@@ -1,10 +1,6 @@
 
 
 public abstract class Person {
-
-public class person {
-
-
     // datafields
     private int id;
     private String phone_no;
@@ -13,16 +9,16 @@ public class person {
     private String name;
     private String address;
 
-    person() {
+    Person() {
     }
 
-    person(String name, String email, String phone) {
+    Person(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone_no = phone;
     }
 
-    public person(String name, String email, String phone_no, String password, String address) {
+    public Person(String name, String email, String phone_no, String password, String address) {
         this.phone_no = phone_no;
         this.password = password;
         this.email = email;

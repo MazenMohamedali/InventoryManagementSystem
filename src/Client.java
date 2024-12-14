@@ -19,7 +19,7 @@ import java.sql.Statement;
  */
 
 
-public class Client extends person {
+public class Client extends Person {
       private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
       private static final int startID = 10000;
       private static int orderCount;
@@ -30,8 +30,12 @@ public class Client extends person {
       public Client() {
       }
 
-      public Client(String name, String email, String password, String address, String phone_no, double balance) {
-            super(name, email, phone_no, password, address);
+      public Client(String name, String email, String phone_no,String password, String address, double balance) {
+            this.setPhone_no(phone_no);
+            this.setPassword(password); 
+            this.setEmail(email);
+            this.setName(name);
+            this.setAddress(address);
             this.balance = balance;
             this.id = startID;
             phoneNumbers.add(phone_no);
