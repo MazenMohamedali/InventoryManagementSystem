@@ -191,13 +191,17 @@ public class AdminINF {
         int supplierID = input.nextInt();
         input.nextLine();
 
+        System.out.print("Enter Profit ratio ");
+        int ProfitRatio = input.nextInt();
+        input.nextLine();
+
         System.out.print("Enter Expiration Date (dd-mm-yyyy): ");
         String expireDateStr = input.nextLine();
 
         System.out.print("Enter Production Date (dd-mm-yyyy): ");
         String productionDateStr = input.nextLine();
         Product product = new Product(name, price, quantity, supplierID, category, expireDateStr,
-                productionDateStr);
+                productionDateStr, ProfitRatio);
         if (Admin.insertProduct(product)) {
             System.out.println("Product " + name + " has been Added");
 

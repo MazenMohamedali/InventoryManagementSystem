@@ -15,8 +15,22 @@ public class Product {
     private String category;
     private String expirDate;
     private String productionDate;
+    private int purchasePrecent;
 
     // VALIDATION METHODS
+
+    // this for formate string to effecency in databasw
+    // if 1-2-2024 will be 01-02-2024
+    private static String makeFormated(String date) {
+        StringBuilder res = new StringBuilder();
+        String[] parts = date.split("-");
+        res.append(parts[0].length() == 1 ? "0" + parts[0] : parts[0]);
+        res.append("-");
+        res.append(parts[1].length() == 1 ? "0" + parts[1] : parts[1]);
+        res.append(parts[2]);
+        return res.toString();
+    }
+
     private static boolean isValidDate(String date) {
         // dd-mm-yyyy-isvalid --0 for not valid ,, 1 for valid
         int[] arrDate = { 0, 0, 0 };
@@ -48,7 +62,7 @@ public class Product {
     }
 
     Product(int id, String name, double price, int initialQuantity, int supplierID, String category, String exDate,
-            String proDate) {
+            String proDate, int purchasePrecent) {
         setName(name);
         setPrice(price);
         setQuantity(initialQuantity);
@@ -57,10 +71,12 @@ public class Product {
         setExpirDate(exDate);
         setProductionDate(proDate);
         setCategory(category);
+        setPurchasePrecent(purchasePrecent);
+
     }
 
     Product(String name, double price, int initialQuantity, int supplierID, String category, String exDate,
-            String proDate) {
+            String proDate, int purchasePrecent) {
         setName(name);
         setPrice(price);
         setQuantity(initialQuantity);
@@ -68,6 +84,7 @@ public class Product {
         setExpirDate(exDate);
         setProductionDate(proDate);
         setCategory(category);
+        setPurchasePrecent(purchasePrecent);
     }
 
     // Getters
@@ -101,6 +118,10 @@ public class Product {
 
     public String getProductionDate() {
         return productionDate;
+    }
+
+    public int getPurchasePrecent() {
+        return purchasePrecent;
     }
 
     // SETTER
@@ -139,7 +160,7 @@ public class Product {
     // DATE FORMATE dd-mm-yyyy
     public void setExpirDate(String expirDate) {
         if (isValidDate(expirDate))
-            this.expirDate = expirDate;
+            this.expirDate = makeFormated(expirDate);
         else {
             throw new IllegalArgumentException("Invalid expiration date format or value: " + expirDate);
         }
@@ -147,7 +168,7 @@ public class Product {
 
     public void setProductionDate(String productionDate) {
         if (isValidDate(productionDate))
-            this.productionDate = productionDate;
+            this.productionDate = makeFormated(productionDate);
         else {
             throw new IllegalArgumentException("Invalid expiration date format or value: " + expirDate);
         }
@@ -155,6 +176,10 @@ public class Product {
 
     protected void setID(int id) {
         this.id = id;
+    }
+
+    public void setPurchasePrecent(int percent) {
+        this.purchasePrecent = percent;
     }
 
     // SEARCH METHODS
@@ -211,14 +236,15 @@ public class Product {
     static void showAll() {
 
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
-                PreparedStatement stmt = conn.prepareStatement("SELECT id,name FROM product")) {
+                PreparedStatement stmt = conn.prepareStatement("SELECT id,name, expireDate FROM product")) {
             ResultSet rs = stmt.executeQuery();
 
             System.out.println("ID\t\tName");
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                System.out.println(id + "\t\t" + name);
+                String ex = rs.getString("expireDate");
+                System.out.println(id + "\t\t" + name + "\t\t\t" + ex);
             }
 
         } catch (SQLException e) {
@@ -226,29 +252,28 @@ public class Product {
         }
     }
 
-    public static void printLine()
-    {
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------");
+    public static void printLine() {
+        System.out.println(
+                "-------------------------------------------------------------------------------------------------------------------------");
     }
 
-    public static void showAllforClient()
-    {
+    public static void showAllforClient() {
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
-             PreparedStatement stmt = conn.prepareStatement("SELECT name, price, quantity, productionDate, expireDate FROM product")) 
-        {
+                PreparedStatement stmt = conn
+                        .prepareStatement("SELECT name, price, quantity, productionDate, expireDate FROM product")) {
             ResultSet rs = stmt.executeQuery();
-            
+
             printLine();
             System.out.println("Name\t\t|\tPrice\t\t|\tQuantity\t|\tProductionDate\t\t|\tExpireDate\t|");
             printLine();
-            while (rs.next()) 
-            {
+            while (rs.next()) {
                 String name = rs.getString(1);
                 double price = rs.getDouble(2);
                 int quantity = rs.getInt(3);
                 String productionDate = rs.getString(4);
                 String expireDate = rs.getString(5);
-                System.out.println(name + "\t\t|\t" + price + "\t\t|\t" + quantity + "\t\t|\t" + productionDate + "\t\t|\t" + expireDate + "\t|");
+                System.out.println(name + "\t\t|\t" + price + "\t\t|\t" + quantity + "\t\t|\t" + productionDate
+                        + "\t\t|\t" + expireDate + "\t|");
                 printLine();
             }
 
@@ -256,23 +281,25 @@ public class Product {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
         }
     }
-    
 
-/*   THIS WORKS BUT WITHOUT VERTICAL SEPARATORS
-
-System.out.println("Name\t\tPrice\t\tQuantity\tProductionDate\t\tExpireDate");
-printLine();
-while (rs.next()) 
-{
-    String name = rs.getString(1);
-    double price = rs.getDouble(2);
-    int quantity = rs.getInt(3);
-    String productionDate = rs.getString(4);
-    String expireDate = rs.getString(5);
-    System.out.println(name + "\t\t" + price + "\t\t" + quantity + "\t\t" + productionDate + "\t\t" + expireDate);
-    printLine();
-}
-*/
+    /*
+     * THIS WORKS BUT WITHOUT VERTICAL SEPARATORS
+     * 
+     * System.out.println("Name\t\tPrice\t\tQuantity\tProductionDate\t\tExpireDate")
+     * ;
+     * printLine();
+     * while (rs.next())
+     * {
+     * String name = rs.getString(1);
+     * double price = rs.getDouble(2);
+     * int quantity = rs.getInt(3);
+     * String productionDate = rs.getString(4);
+     * String expireDate = rs.getString(5);
+     * System.out.println(name + "\t\t" + price + "\t\t" + quantity + "\t\t" +
+     * productionDate + "\t\t" + expireDate);
+     * printLine();
+     * }
+     */
 
     static void showProuct(int id) {
 
@@ -300,4 +327,25 @@ while (rs.next())
         }
     }
 
+    // public static void main(String[] args) {
+    // showAll();
+    // // searchProductName("milk");
+
+    // try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+    // Statement stm = conn.createStatement()) {
+
+    // // Add the new column with a default value of 0
+    // String alterTableSQL = "ALTER TABLE product ADD COLUMN purchasePrecent int
+    // NOT NULL DEFAULT 0";
+
+    // // Execute the ALTER TABLE statement
+    // stm.executeUpdate(alterTableSQL);
+    // System.out.println("Column added successfully.");
+
+    // } catch (SQLException e) {
+    // System.out.println("SQL Error: " + e.getMessage());
+    // }
+    // }
+
+    // Dummy method for showing all
 }

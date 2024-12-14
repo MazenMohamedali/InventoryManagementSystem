@@ -123,7 +123,7 @@ public class Admin {
 
     // ADD PRODUCT ---> DONE
     public static boolean insertProduct(Product product) {
-        String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate) VALUES (? ,?, ?, ?, ?, ?, ?)";
+        String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate, purchasePrecent) VALUES (? ,?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
                 PreparedStatement statement = connection.prepareStatement(sqlquary)) {
@@ -131,6 +131,7 @@ public class Admin {
             statement.setBigDecimal(2, BigDecimal.valueOf(product.getPrice()));
             statement.setInt(3, product.getQuantity());
             statement.setString(4, product.getCategory()); // Set the category
+            statement.setInt(8, product.getPurchasePrecent());
             if (checkSupllierId(product.getSupplierID())) {
                 statement.setInt(5, product.getSupplierID());
             } else {
