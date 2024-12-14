@@ -21,22 +21,6 @@ public class Order {
     private LocalDate arrivalDate;    
 
 
-      public order(Product[] products)
-      {
-            this.orderID = idCounter++;  
-            this.prodID = new int[products.length];
-            this.amount = new int[products.length];
-            this.pricePerID = new double[products.length];
-            for (int i = 0; i < products.length; i++) {
-                this.prodID[i] = products[i].getId();
-                this.amount[i] = 1;
-                this.pricePerID[i] = products[i].getPrice();
-            }
-            this.clientAddress = "";
-            this.orderDate = LocalDate.now();
-            this.arrivalDate = LocalDate.now().plusDays(7);
-            calculateTotalPrice();  
-      }
 
     public Order(int[] prodID, int[] amount, double[] pricePerID, String clientAddress, LocalDate orderDate, LocalDate arrivalDate) {
         this.orderID = idCounter++;  
