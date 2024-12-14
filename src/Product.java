@@ -211,44 +211,43 @@ public class Product {
     static void showAll() {
 
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
-                PreparedStatement stmt = conn.prepareStatement("SELECT id,name FROM product")) {
+                PreparedStatement stmt = conn.prepareStatement("SELECT id,name,sup_id FROM product")) {
             ResultSet rs = stmt.executeQuery();
 
-            System.out.println("ID\t\tName");
+            System.out.printf("%-10s %-20s %-10s \n", "ID", "Name", "Supplier_ID");
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
-                System.out.println(id + "\t\t" + name);
+                int supplier_id = rs.getInt("sup_id");
+                System.out.printf("%-10d %-20s %-10d \n", id, name, supplier_id);
             }
-
         } catch (SQLException e) {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
         }
     }
 
-    public static void printLine()
-    {
-        System.out.println("-------------------------------------------------------------------------------------------------------------------------");
+    public static void printLine() {
+        System.out.println(
+                "-------------------------------------------------------------------------------------------------------------------------");
     }
 
-    public static void showAllforClient()
-    {
+    public static void showAllforClient() {
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
-             PreparedStatement stmt = conn.prepareStatement("SELECT name, price, quantity, productionDate, expireDate FROM product")) 
-        {
+                PreparedStatement stmt = conn
+                        .prepareStatement("SELECT name, price, quantity, productionDate, expireDate FROM product")) {
             ResultSet rs = stmt.executeQuery();
-            
+
             printLine();
             System.out.println("Name\t\t|\tPrice\t\t|\tQuantity\t|\tProductionDate\t\t|\tExpireDate\t|");
             printLine();
-            while (rs.next()) 
-            {
+            while (rs.next()) {
                 String name = rs.getString(1);
                 double price = rs.getDouble(2);
                 int quantity = rs.getInt(3);
                 String productionDate = rs.getString(4);
                 String expireDate = rs.getString(5);
-                System.out.println(name + "\t\t|\t" + price + "\t\t|\t" + quantity + "\t\t|\t" + productionDate + "\t\t|\t" + expireDate + "\t|");
+                System.out.println(name + "\t\t|\t" + price + "\t\t|\t" + quantity + "\t\t|\t" + productionDate
+                        + "\t\t|\t" + expireDate + "\t|");
                 printLine();
             }
 
@@ -256,23 +255,25 @@ public class Product {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
         }
     }
-    
 
-/*   THIS WORKS BUT WITHOUT VERTICAL SEPARATORS
-
-System.out.println("Name\t\tPrice\t\tQuantity\tProductionDate\t\tExpireDate");
-printLine();
-while (rs.next()) 
-{
-    String name = rs.getString(1);
-    double price = rs.getDouble(2);
-    int quantity = rs.getInt(3);
-    String productionDate = rs.getString(4);
-    String expireDate = rs.getString(5);
-    System.out.println(name + "\t\t" + price + "\t\t" + quantity + "\t\t" + productionDate + "\t\t" + expireDate);
-    printLine();
-}
-*/
+    /*
+     * THIS WORKS BUT WITHOUT VERTICAL SEPARATORS
+     * 
+     * System.out.println("Name\t\tPrice\t\tQuantity\tProductionDate\t\tExpireDate")
+     * ;
+     * printLine();
+     * while (rs.next())
+     * {
+     * String name = rs.getString(1);
+     * double price = rs.getDouble(2);
+     * int quantity = rs.getInt(3);
+     * String productionDate = rs.getString(4);
+     * String expireDate = rs.getString(5);
+     * System.out.println(name + "\t\t" + price + "\t\t" + quantity + "\t\t" +
+     * productionDate + "\t\t" + expireDate);
+     * printLine();
+     * }
+     */
 
     static void showProuct(int id) {
 
@@ -282,7 +283,8 @@ while (rs.next())
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
-            System.out.println("----------------------------------------------------------------------");
+            System.out.println(
+                    "--------------------------------------------------------------------------------------------------");
             System.out.printf("%-10s %-20s %-20s %-10s %-10s %-10s%n",
                     "ID", "Name", "Category", "Price", "Quantity", "Supplier_ID");
 
@@ -294,7 +296,8 @@ while (rs.next())
 
             System.out.printf("%-10d %-20s %-20s %-10.2f %-10d %-10d%n",
                     id, name, category, price, quantity, sup_id);
-            System.out.println("----------------------------------------------------------------------");
+            System.out.println(
+                    "--------------------------------------------------------------------------------------------------");
         } catch (SQLException e) {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
         }

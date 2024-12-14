@@ -52,6 +52,21 @@ public class Supplier extends person {
         }
     }
 
+    public static boolean checkSupllierId(int sup_id) {
+        try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+                PreparedStatement stmt = conn.prepareStatement("SELECT name FROM supplier WHERE id = ?")) {
+
+            stmt.setInt(1, sup_id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
     @Override
     public String toString() {
         return this.getId() + this.getName();
