@@ -118,18 +118,18 @@ public class Admin {
             statement.setInt(3, product.getQuantity());
             statement.setString(4, product.getCategory()); // Set the category
             statement.setInt(8, product.getPurchasePrecent());
-                if (Supplier.checkSupllierId(product.getSupplierID())) {
-                    statement.setInt(5, product.getSupplierID());
-                } else {
-                    System.out.println("Supplier id not found");
-                }
-                statement.setString(6, product.getExpirDate()); 
-                statement.setString(7, product.getProductionDate()); 
+            if (Supplier.checkSupllierId(product.getSupplierID())) {
+                statement.setInt(5, product.getSupplierID());
+            } else {
+                System.out.println("Supplier id not found");
+            }
+            statement.setString(6, product.getExpirDate());
+            statement.setString(7, product.getProductionDate());
 
-               return statement.executeUpdate() > 0;
+            return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return x;
+            return false;
         }
     }
 
