@@ -100,4 +100,91 @@ public class garbage {
             e.printStackTrace();
         }
     }
+
+
+    public int[] ordersIdForSpacificMonth() {
+        String sqlQuary = "SELECT id FROM orders WHERE arrival_date LIKE ?";
+        try(Connection conn = DriverManager.getConnection(connectDB.getDburl());
+        PreparedStatement pre = conn.prepareStatement(sqlQuary)) {
+
+            String monthFormated = String.format("%02d", month);
+            String dateFormated = "%-" + monthFormated + "-" + year;
+
+            pre.setString(1, dateFormated);
+            ResultSet executed = pre.executeQuery();
+
+            int counter = 0;
+            while (executed.next()) {
+                counter++;
+            }
+
+            // Rewind the ResultSet for further processing
+            executed.beforeFirst();
+
+            int[] orders = new int[counter];
+            int i=0;
+            while (executed.next()) {
+                orders[i++] = executed.getInt("id");
+            }
+            return orders;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new int[0];
+        }
+    }
+
+    // صدمه
+    //SQLite only supports TYPE_FORWARD_ONLY cursors
+    public static String[] generlizeSelect(String[] columns, String table, String hasWhere) {
+        StringBuilder sqlQuary = new StringBuilder("SELECT ");// = "SELECT id,  FROM orders WHERE arrival_date LIKE ?";
+        
+        int len = columns.length;
+        for(int i=0; i<len; i++) {
+            sqlQuary.append(columns[i]);
+            if(i != len-1)
+                sqlQuary.append(", ");
+        }
+
+        sqlQuary.append(" FROM ").append(table);
+        if(hasWhere != "") {
+            sqlQuary.append(" WHERE ").append(hasWhere);
+        }
+
+
+        String[] results = null;
+        int rowCount = 0;
+
+
+        try(Connection conn = DriverManager.getConnection(connectDB.getDburl());
+            // ResultSet.TYPE_SCROLL_INSENSITIVE: used for "resultSet.beforeFirst(); // rewind", 
+            //You can scroll (move) both forward and backward in the ResultSet.
+
+            // ResultSet.CONCUR_READ_ONLY: This defines the concurrency mode of the ResultSet
+        PreparedStatement preSatement = conn.prepareStatement(sqlQuary.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+            ResultSet resultSet = preSatement.executeQuery();
+            
+            
+            // count numbers of row to hold in array becuse more efficent use arrayList
+            resultSet.last(); // this last row in query
+            rowCount = resultSet.getRow(); // count of rows
+            resultSet.beforeFirst(); // rewind
+
+            results = new String[rowCount];
+
+            int k=0;
+            while (resultSet.next()) {
+                StringBuilder row = new StringBuilder();
+                for(int i=0; i<len; i++) {
+                    row.append(resultSet.getString(columns[i]));
+                    if(i != len-1)
+                        row.append(", ");
+                }
+                results[k++] = row.toString();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
 }

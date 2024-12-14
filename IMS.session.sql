@@ -31,16 +31,19 @@ ALTER TABLE product
 ALTER TABLE product
       ADD COLUMN productionDate TEXT NOT NULL;
 
+ALTER TABLE purchasePrecent
+ADD COLUMN purchasePrecent int NOT NULL;
 
 
-CREATE TABLE prod_sup
-(
-      supplier_id INT NOT NULL,
-      prod_id INT NOT NULL,
-      FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE CASCADE,
-      FOREIGN KEY (prod_id) REFERENCES product(id) ON DELETE CASCADE,
-      PRIMARY KEY (supplier_id, prod_id)
-);
+
+-- CREATE TABLE prod_sup
+-- (
+--       supplier_id INT NOT NULL,
+--       prod_id INT NOT NULL,
+--       FOREIGN KEY (supplier_id) REFERENCES supplier(id) ON DELETE CASCADE,
+--       FOREIGN KEY (prod_id) REFERENCES product(id) ON DELETE CASCADE,
+--       PRIMARY KEY (supplier_id, prod_id)
+-- );
 
 CREATE TABLE phone_numbers
 (
@@ -85,3 +88,4 @@ CREATE TABLE complaints
 	FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+SELECT * FROM product
