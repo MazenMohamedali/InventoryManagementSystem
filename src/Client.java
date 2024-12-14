@@ -98,7 +98,7 @@ public class Client extends Person {
                         System.out.println("Client and phone number added successfully.");
                   }
             } catch (SQLException e) {
-                  System.out.println("Error: " + e.getMessage());
+                  System.err.println("Error: " + e.getMessage());
             }
       }
 
