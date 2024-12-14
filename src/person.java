@@ -1,9 +1,5 @@
 
-
-public abstract class Person {
-
 public class person {
-
 
     // datafields
     private int id;
