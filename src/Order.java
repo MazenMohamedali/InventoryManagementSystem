@@ -114,10 +114,10 @@ public class Order {
             throw new IllegalArgumentException("Product names and amounts arrays must have the same length.");
         }
 
-        String insertOrderSQL = "INSERT INTO orders (clientAddress, orderDate, arrivalDate, totalPrice) VALUES (?, ?, ?, ?)";
-        String insertOrderProdSQL = "INSERT INTO order_prod (orderID, productID, amount) VALUES (?, ?, ?)";
-        String updateProductSQL = "UPDATE product SET col_amount = col_amount - ? WHERE col_name = ?";
-        String selectProductSQL = "SELECT id, col_amount FROM product WHERE col_name = ?";
+        String insertOrderSQL = "INSERT INTO orders (id,client_address, arrival_Date, price,client_id,order_datetime) VALUES (?, ?, ?, ?)";
+        String insertOrderProdSQL = "INSERT INTO order_prod (prod_id, order_id, quantity) VALUES (?, ?, ?)";
+        String updateProductSQL = "UPDATE product SET Quantity = Quantity - ? WHERE id,name=id,name ?";
+        String selectProductSQL = "SELECT id, Quantity FROM product WHERE name=name ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             conn.setAutoCommit(false); // Start transaction
@@ -139,7 +139,7 @@ public class Order {
                             throw new IllegalArgumentException("Product not found: " + productNames[i]);
                         }
                         int productID = rs.getInt("id");
-                        int availableAmount = rs.getInt("col_amount");
+                        int availableAmount = rs.getInt("Quantity");
                         if (amounts[i] > availableAmount) {
                             throw new IllegalArgumentException("Insufficient stock for product: " + productNames[i]);
                         }
