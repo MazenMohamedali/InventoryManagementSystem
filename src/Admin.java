@@ -111,30 +111,30 @@ public class Admin {
     public static boolean insertProduct(Product product) {
         String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate, purchasePrecent) VALUES (? ,?, ?, ?, ?, ?, ?, ?)";
 
+        boolean x = false;
         try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
                 PreparedStatement statement = connection.prepareStatement(sqlquary)) {
             statement.setString(1, product.getName());
             statement.setBigDecimal(2, BigDecimal.valueOf(product.getPrice()));
             statement.setInt(3, product.getQuantity());
             statement.setString(4, product.getCategory()); // Set the category
-<<<<<<< HEAD
             statement.setInt(8, product.getPurchasePrecent());
-            if (checkSupllierId(product.getSupplierID())) {
-=======
             if (Supplier.checkSupllierId(product.getSupplierID())) {
->>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
-                statement.setInt(5, product.getSupplierID());
-            } else {
-                System.out.println("Supplier id not found");
-            }
-            statement.setString(6, product.getExpirDate()); // Set the expiration date
-            statement.setString(7, product.getProductionDate()); // Set the production date
+                if (Supplier.checkSupllierId(product.getSupplierID())) {
+                    statement.setInt(5, product.getSupplierID());
+                } else {
+                    System.out.println("Supplier id not found");
+                }
+                statement.setString(6, product.getExpirDate()); // Set the expiration date
+                statement.setString(7, product.getProductionDate()); // Set the production date
 
-            return statement.executeUpdate() > 0;
+                x = statement.executeUpdate() > 0;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return x;
         }
+        return x;
     }
 
     // DELETE PRODUCT ---> DONE

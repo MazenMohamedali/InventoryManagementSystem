@@ -1,6 +1,6 @@
 import java.sql.*;
 
-public class Supplier extends person {
+public class Supplier extends Person {
     Supplier() {
     }
 
@@ -12,7 +12,7 @@ public class Supplier extends person {
 
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
                 PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT s.id,s.name,s.email,p.phone_number FROM supplier s JOIN phone_numbers p ON s.id = p.id ")) {
+                        "SELECT s.id,s.name,s.email,p.phone_number FROM supplier s JOIN phone_numbers p ON s.id = p.id ORDER BY s.id")) {
             ResultSet rs = stmt.executeQuery();
             System.out.println("-----------------------------------------------------------");
 

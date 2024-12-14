@@ -1,10 +1,11 @@
 
-
-public abstract class Person {
-
+<<<<<<< HEAD
 public class person {
 
+=======
 
+public abstract class Person {
+>>>>>>> 175b6c0936298d442bd454f0ab73a24c0f33bb2b
     // datafields
     private int id;
     private String phone_no;
@@ -13,16 +14,16 @@ public class person {
     private String name;
     private String address;
 
-    person() {
+    Person() {
     }
 
-    person(String name, String email, String phone) {
+    Person(String name, String email, String phone) {
         this.name = name;
         this.email = email;
         this.phone_no = phone;
     }
 
-    public person(String name, String email, String phone_no, String password, String address) {
+    public Person(String name, String email, String phone_no, String password, String address) {
         this.phone_no = phone_no;
         this.password = password;
         this.email = email;

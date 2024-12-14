@@ -197,16 +197,13 @@ public class AdminINF {
         int supplierID = input.nextInt();
         input.nextLine();
 
-<<<<<<< HEAD
         System.out.print("Enter Profit ratio ");
         int ProfitRatio = input.nextInt();
         input.nextLine();
-=======
         if (!Supplier.checkSupllierId(supplierID)) {
             System.out.println("Supplier id not found");
             System.exit(1);
         }
->>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
 
         System.out.print("Enter Expiration Date (dd-mm-yyyy): ");
         String expireDateStr = input.nextLine();
