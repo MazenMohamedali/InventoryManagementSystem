@@ -1,7 +1,11 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class ClientWindow //TODO shit spazes out when you enter a string instead of a number
@@ -26,7 +30,8 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
             }
             catch(Exception e)
             {
-                  e.printStackTrace();
+                  System.err.println("Error: " + e.getMessage());
+                  return 0;
             }
             return option;
       }
@@ -34,32 +39,52 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
 
       public static void viewProducts()//TODO "Warning: products such and such are nearing the expiry date
       {
+            String pattern = "dd-MM-yyyy";
+            String dateInString = new SimpleDateFormat(pattern).format(new Date());
+            System.out.println("date: "+ dateInString);
             Product.showAllforClient();
             printSeparator();
       } 
 
 
+
       public static void createOrder()//TODO finish prompts
       {
+            viewProducts();
             
             ArrayList<String> productNames = new ArrayList<String>();
 
             String temp = "";
             while(!temp.equalsIgnoreCase("exit"))
             {
-                  System.out.print("Please enter a product's name (enter 'exit' to finish): ");
-                  temp = in.next();
+                  try
+                  {
+                        System.out.print("Please enter a product's name (enter 'exit' to finish): ");
+                        temp = in.next();
+                        boolean found = Client.exists("product","name",temp);
 
-                  
-                  if(!temp.equalsIgnoreCase("exit") & !productNames.contains(temp))
-                  {
-                        productNames.add(temp);
+                        if(!found & !temp.equalsIgnoreCase("exit"))
+                        {
+                              printSeparator();
+                              System.err.println("This product is not on the list");
+                              printSeparator();
+                              continue;
+                        }
+                        
+                        if(!temp.equalsIgnoreCase("exit") & !productNames.contains(temp))
+                        {
+                              productNames.add(temp);
+                        }
+                        else if(productNames.contains(temp))
+                        {
+                              printSeparator();
+                              System.out.println("this product has already been enterd");
+                              printSeparator();
+                        }
                   }
-                  else if(productNames.contains(temp))
+                  catch(Exception e)
                   {
-                        printSeparator();
-                        System.out.println("this product has already been enterd");
-                        printSeparator();
+
                   }
             }
             
@@ -69,8 +94,17 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
             for(int i = 0; i < productNames.size(); i++)
             {
                   System.out.print(i + ": " + productNames.get(i) + ": ");
-                  
-                  amounts[i] = in.nextInt();
+                  int amount = in.nextInt();
+                  if(amount <= 0)
+                  {
+                        printSeparator();
+                        System.out.println("Invalid amount. Please enter a positive integer");
+                        i--;
+                        printSeparator();
+                        continue;
+                  }
+
+                  amounts[i] = amount;
             }
             printSeparator();
             System.out.println("You Entered:");
@@ -85,6 +119,9 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
             if(ans.equals("y"))
             {
                   //TODO update the DB
+
+                  
+                  printSeparator();
                   System.out.println("order has been placed! Please check the invoice or report to view the order's details");
                   printSeparator();
             }
@@ -97,14 +134,26 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                         {
                               System.out.println(j + ": " + productNames.get(j) + ": " + amounts[j] + " units");
                         }
-                        System.out.print("\nre-enter the name of the product (enter 'next' to skip this product)\n" + i + ": ");
+                        System.out.print("\nre-enter the name of the product (enter 'skip' to skip this product and 'exit' to finish)\n" + i + ": ");
                         temp = in.next();
+                        boolean found = Client.exists("product", "name", temp);
+
+                        if(!found)
+                        {
+                              printSeparator();
+                              System.err.println("This product is not on the list");
+                              continue;
+                        }
+
                         printSeparator();
-                        if(temp.equalsIgnoreCase("next"))
+                        if(temp.equalsIgnoreCase("skip"))
                         {
                               continue;
                         }
-                        
+                        if (temp.equalsIgnoreCase("exit")) 
+                        {
+                              break;      
+                        }
                         productNames.set(i, temp);
                         System.out.print("Please re-enter the amount of " + productNames.get(i) + ": ");
                         amounts[i] = in.nextInt();
@@ -112,6 +161,9 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                         
                         //TODO update DB
                   }
+                  printSeparator();
+                  System.out.println("order has been placed! Please check the invoice or report to view the order's details");
+                  printSeparator();
             }
       }
 
@@ -326,37 +378,50 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
       }
 
 
+
       public static void show(int id)
       {
             boolean exit = false;
-            while(exit != true)
+            try
             {
-
-                  int option = getOption(id);
-                  switch (option) 
+                  while(exit != true)
                   {
-                        case 1://create order
+                        int option = getOption(id);
+
+                        if(option == 1)//create order
+                        {
                               createOrder();
-                              break;
-                        case 2://view report
+                        }
+                        else if(option == 2)//TODO: view report
+                        {
                               ClientReport.genReport(id);
-                              break;
-                        case 3://view products
+                        }
+                        else if(option == 3)//view products
+                        {
                               viewProducts();
-                              break;                             
-                        case 4://edit account
+                        }                                  
+                        else if(option == 4)//edit account
+                        {
                               editAccount(id);
-                              break;
-                        case 5://log out
+                        }
+                        else if(option == 5)//log out
+                        {
+                              printSeparator();
                               System.out.println("Goodbye!");
+                              printSeparator();
                               exit = true;
                               break;
-                        default:
-                              System.out.println("Invalid option. Please try again.");
-                              break;
+                        }    
                   }
             }
+            catch(InputMismatchException e)
+            {
+                  System.err.println("Invalid input. Please enter a number.");
+                  in.nextLine();
+            }
       }
+
+
 
       public static void printSeparator()
       {
