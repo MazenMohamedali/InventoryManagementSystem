@@ -1,6 +1,7 @@
 import java.math.BigDecimal;
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Locale;
 
@@ -232,15 +233,38 @@ public class Product {
         return search("product", "expireDate", productExpirationDate);
     }
 
+    
+    public static String[] notifyExpire() {
+        String[] col = {"id", "name", "expireDate", "quantity"};
+        LocalDate currentDate = LocalDate.now();
+        int month = currentDate.getMonthValue();
+        int year = currentDate.getYear();
+        String[] res = connectDB.generlizeSelect(col, "product", "expireDate LIKE '%-" + month + "-" +year + "' OR quantity<=10");
+        return res;
+    }   
+
+    // public static String[] offerForExpired() {
+    //     LocalDate currentDate = LocalDate.now();
+    //     int month = currentDate.getMonthValue();
+    //     int year = currentDate.getYear();
+        
+    //     String[] col = {"id", "name", "expireDate", "quantity", "purchasePrecent"};
+    //     String[] res = connectDB.generlizeSelect(col, "product", "expireDate LIKE '%-" + month + "-" +year + "'");
+    //     for(int i=0; i<res.length; i++) {
+    //         String[] row = res[i].split(", ");
+    //         int id = Integer.parseInt(row[0]);
+
+            
+    //     }
+    //     return res;
+    // }   
+
     // SHOW ALL FUNC --> OMAR MOHSEN <--
     static void showAll() {
 
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
-<<<<<<< HEAD
-                PreparedStatement stmt = conn.prepareStatement("SELECT id,name, expireDate FROM product")) {
-=======
+
                 PreparedStatement stmt = conn.prepareStatement("SELECT id,name,sup_id FROM product")) {
->>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
             ResultSet rs = stmt.executeQuery();
 
             System.out.printf("%-10s %-20s %-10s \n", "ID", "Name", "Supplier_ID");
@@ -249,7 +273,7 @@ public class Product {
                 String name = rs.getString("name");
                 int supplier_id = rs.getInt("sup_id");
                 System.out.printf("%-10d %-20s %-10d \n", id, name, supplier_id);
->>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
+
             }
         } catch (SQLException e) {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
@@ -333,25 +357,10 @@ public class Product {
         }
     }
 
-    // public static void main(String[] args) {
-    // showAll();
-    // // searchProductName("milk");
-
-    // try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
-    // Statement stm = conn.createStatement()) {
-
-    // // Add the new column with a default value of 0
-    // String alterTableSQL = "ALTER TABLE product ADD COLUMN purchasePrecent int
-    // NOT NULL DEFAULT 0";
-
-    // // Execute the ALTER TABLE statement
-    // stm.executeUpdate(alterTableSQL);
-    // System.out.println("Column added successfully.");
-
-    // } catch (SQLException e) {
-    // System.out.println("SQL Error: " + e.getMessage());
-    // }
-    // }
-
-    // Dummy method for showing all
+    public static void main(String[] args) {
+        String[] res = notifyExpire();
+        for(String i : res) {
+            System.out.println(i);
+        }
+    }
 }

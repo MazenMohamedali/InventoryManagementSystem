@@ -2,14 +2,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.classfile.BufWriter;
-import java.nio.file.FileAlreadyExistsException;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class AdminReport {
     private int month;
@@ -88,7 +80,7 @@ public class AdminReport {
 
     // Third, for this product we need to know what is price , Profit ratio, name
         
-    // will return {"id", "Quantity sold", "name", "price", "current Quantity", "category", "sup_id"}; for Products purchased
+    // will return {"id", "Quantity sold", "name", "price", "current Quantity", "Profit_ratio", "category", "sup_id"}; for Products purchased
     public String[] dataForProductsPurchased() {
         String[] ProductsPurchased = ProductAndQuantityOrderd();
 
@@ -98,14 +90,11 @@ public class AdminReport {
             whereQuery.append(ProductsPurchased[i].charAt(0));
             if(i != ProductsPurchasedLen-1)
                 whereQuery.append(", ");
-
-            
-
         }
         whereQuery.append(")");
 
         
-        String[] col = {"name", "price", "quantity", "purchasePrecent", "category", "sup_id"};
+        String[] col = {"name", "price", "quantity", "purchasePrecent", "category", "sup_id", };
         String[] result = connectDB.generlizeSelect(col, "product", whereQuery.toString());
         
         
@@ -124,37 +113,71 @@ public class AdminReport {
     // Finaly, we have: products are purches for spacific month, quantity, price for each product, and Profit ratio
     // then, we can make Profit report for each month
     // ,put each Profit in file with name is month and year for profit
-    /**
-     * @return
-     */
-    public boolean GenerateMonthlyRepor() throws IOException {
-        String filePath = "../Reports/" + month + "_" + year;
+    public boolean generateMonthlyReport() throws IOException {
+        String filePath = "../Reports/" + month + "_" + year + ".text"; // Add file extension for clarity
         File file = new File(filePath);
-        try {
-            if(!file.exists()) {
-                file.createNewFile(filePath);
+        // System.out.println("File path: " + file.getAbsolutePath());
+
+        // Ensure the directory exists
+        File reportDir = file.getParentFile();
+        if (!reportDir.exists()) {
+            reportDir.mkdirs();
+        }
+
+        // Create file if it doesn't exist
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        // Use try-with-resources to handle closing
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            // Write header
+            bw.write("---------------------------- Welcome ----------------------------\n");
+            bw.write("------------------ Report For Date: " + month + "/" + year + " ------------------\n");
+            bw.write("--------------------------------------------------------\n");
+            bw.write("ProdID\t\tQuantitySold\t\tName\t\tPrice\t\tCurrQuantity\t\tProfit Ratio\t\tCategory\t\tSupplierID\n");
+
+            // Process data
+            double totalSold = 0;
+            double totalProfit = 0;
+            String[] dataForMonth = dataForProductsPurchased();
+
+            for (String dataRow : dataForMonth) {
+                String[] row = dataRow.split(", ");
+                double quantitySold = 0;
+                double profitRatio = 0;
+                double price = 0;
+
+                // Write row data
+                for (int j = 0; j < row.length; j++) {
+                    bw.write(row[j] + "\t\t");
+                    if (j == 1) 
+                        quantitySold = Double.parseDouble(row[j]); 
+                    if (j == 3) 
+                        price = Double.parseDouble(row[j]); 
+                    if (j == 5) 
+                        profitRatio = Double.parseDouble(row[j]); 
+                }
+
+                totalSold += quantitySold;
+                totalProfit += (quantitySold * price * profitRatio) / 100; 
+                bw.write("\n");
             }
+
+            // Write totals
+            bw.write("--------------------------------------------------------\n");
+            bw.write("Total Profit: " + totalProfit + "\t\tTotal Sold: " + totalSold + "\n");
+
+            return true; 
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
-        FileWriter report = new FileWriter(file, false);
-        BufferedWriter bw = new BufferedWriter (report);
-        bw.write("----------------------------Wlcome----------------------------\n");
-        bw.write("----------------------------This Report For Date "+ month + "/" + year +" ----------------------------\n");
-        bw.write("--------------------------------------------------------\n");
-    // will return {"id", "Quantity sold", "name", "price", "current Quantity", "category", "sup_id"}; for Products purchased
-        
-        bw.write("Product ID\t\tQuantity sold\t\tName\t\tPrice\t\tcurrent Quantity\t\tCategory\t\tsup_id\n");
-
-        // file up to date , file is created
-        return true;
-        
-
     }
-    public static void main(String[] args) {
+    
+    public static void main(String[] args) throws IOException {
         AdminReport test = new AdminReport(12, 2024);
-        String[] tesData = test.dataForProductsPurchased();
-        for(String S : tesData) {
-            System.out.println(S);
-        }
+        System.out.println(test.generateMonthlyReport());
     }
 }
 
