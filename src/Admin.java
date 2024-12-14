@@ -111,7 +111,6 @@ public class Admin {
     public static boolean insertProduct(Product product) {
         String sqlquary = "INSERT INTO product (name, price, quantity, category, sup_id, expireDate, ProductionDate, purchasePrecent) VALUES (? ,?, ?, ?, ?, ?, ?, ?)";
 
-        boolean x = false;
         try (Connection connection = DriverManager.getConnection(connectDB.getDburl());
                 PreparedStatement statement = connection.prepareStatement(sqlquary)) {
             statement.setString(1, product.getName());
@@ -119,22 +118,19 @@ public class Admin {
             statement.setInt(3, product.getQuantity());
             statement.setString(4, product.getCategory()); // Set the category
             statement.setInt(8, product.getPurchasePrecent());
-            if (Supplier.checkSupllierId(product.getSupplierID())) {
                 if (Supplier.checkSupllierId(product.getSupplierID())) {
                     statement.setInt(5, product.getSupplierID());
                 } else {
                     System.out.println("Supplier id not found");
                 }
-                statement.setString(6, product.getExpirDate()); // Set the expiration date
-                statement.setString(7, product.getProductionDate()); // Set the production date
+                statement.setString(6, product.getExpirDate()); 
+                statement.setString(7, product.getProductionDate()); 
 
-                x = statement.executeUpdate() > 0;
-            }
+               return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return x;
         }
-        return x;
     }
 
     // DELETE PRODUCT ---> DONE
@@ -158,11 +154,8 @@ public class Admin {
         try (Connection conn = DriverManager.getConnection(DB_URL);
                 PreparedStatement stmt = conn.prepareStatement("UPDATE product SET " + option + " = ? WHERE id = ?")) {
 
-            // stmt.setString(1, option);
             stmt.setDouble(1, x);
             stmt.setInt(2, id);
-
-            // ResultSet rs = stmt.executeQuery();
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
