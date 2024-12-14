@@ -109,6 +109,103 @@ public class Order {
             }
         }
     }
+    public static void processOrder(String[] productNames, int[] amounts, String clientAddress, LocalDate orderDate, LocalDate arrivalDate) {
+        if (productNames.length != amounts.length) {
+            throw new IllegalArgumentException("Product names and amounts arrays must have the same length.");
+        }
+
+        String insertOrderSQL = "INSERT INTO orders (id,client_address, arrival_Date, price,client_id,order_datetime) VALUES (?, ?, ?, ?)";
+        String insertOrderProdSQL = "INSERT INTO order_prod (prod_id, order_id, quantity) VALUES (?, ?, ?)";
+        String updateProductSQL = "UPDATE product SET Quantity = Quantity - ? WHERE id,name=id,name ?";
+        String selectProductSQL = "SELECT id, Quantity FROM product WHERE name=name ?";
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            conn.setAutoCommit(false); // Start transaction
+
+            try (
+                PreparedStatement orderStmt = conn.prepareStatement(insertOrderSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+                PreparedStatement orderProdStmt = conn.prepareStatement(insertOrderProdSQL);
+                PreparedStatement updateProductStmt = conn.prepareStatement(updateProductSQL);
+                PreparedStatement selectProductStmt = conn.prepareStatement(selectProductSQL)
+            ) {
+                double totalPrice = 0.0;
+
+                // 1. Calculate total price and validate product availability
+                int[] productIDs = new int[productNames.length];
+                for (int i = 0; i < productNames.length; i++) {
+                    selectProductStmt.setString(1, productNames[i]);
+                    try (ResultSet rs = selectProductStmt.executeQuery()) {
+                        if (!rs.next()) {
+                            throw new IllegalArgumentException("Product not found: " + productNames[i]);
+                        }
+                        int productID = rs.getInt("id");
+                        int availableAmount = rs.getInt("Quantity");
+                        if (amounts[i] > availableAmount) {
+                            throw new IllegalArgumentException("Insufficient stock for product: " + productNames[i]);
+                        }
+                        productIDs[i] = productID;
+                        totalPrice += amounts[i] * getProductPrice(productID, conn); // Assume a method for product price
+                    }
+                }
+
+                // 2. Log the order in the orders table
+                orderStmt.setString(1, clientAddress);
+                orderStmt.setDate(2, java.sql.Date.valueOf(orderDate));
+                orderStmt.setDate(3, java.sql.Date.valueOf(arrivalDate));
+                orderStmt.setDouble(4, totalPrice);
+                orderStmt.executeUpdate();
+
+                // Retrieve the generated order ID
+                int orderID;
+                try (ResultSet rs = orderStmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        orderID = rs.getInt(1);
+                    } else {
+                        throw new SQLException("Failed to retrieve generated order ID.");
+                    }
+                }
+
+                // 3. Log order products and update product stock
+                for (int i = 0; i < productNames.length; i++) {
+                    // Log in order_prod table
+                    orderProdStmt.setInt(1, orderID);
+                    orderProdStmt.setInt(2, productIDs[i]);
+                    orderProdStmt.setInt(3, amounts[i]);
+                    orderProdStmt.addBatch();
+
+                    // Update product stock
+                    updateProductStmt.setInt(1, amounts[i]);
+                    updateProductStmt.setString(2, productNames[i]);
+                    updateProductStmt.addBatch();
+                }
+                orderProdStmt.executeBatch();
+                updateProductStmt.executeBatch();
+
+                conn.commit(); // Commit transaction
+                System.out.println("Order processed successfully!");
+            } catch (Exception e) {
+                conn.rollback(); // Rollback on error
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static double getProductPrice(int productID, Connection conn) throws SQLException {
+        String selectPriceSQL = "SELECT price FROM product WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(selectPriceSQL)) {
+            stmt.setInt(1, productID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("price");
+                } else {
+                    throw new IllegalArgumentException("Price not found for product ID: " + productID);
+                }
+            }
+        }
+    }
+
 
     //Display order details
     public void displayOrder() {

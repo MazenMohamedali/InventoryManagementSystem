@@ -236,7 +236,11 @@ public class Product {
     static void showAll() {
 
         try (Connection conn = DriverManager.getConnection(connectDB.getDburl());
+<<<<<<< HEAD
                 PreparedStatement stmt = conn.prepareStatement("SELECT id,name, expireDate FROM product")) {
+=======
+                PreparedStatement stmt = conn.prepareStatement("SELECT id,name,sup_id FROM product")) {
+>>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
             ResultSet rs = stmt.executeQuery();
 
             System.out.printf("%-10s %-20s %-10s \n", "ID", "Name", "Supplier_ID");
@@ -245,6 +249,7 @@ public class Product {
                 String name = rs.getString("name");
                 int supplier_id = rs.getInt("sup_id");
                 System.out.printf("%-10d %-20s %-10d \n", id, name, supplier_id);
+>>>>>>> bcaf8adc84598207d248dd1068df672317e5b164
             }
         } catch (SQLException e) {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
