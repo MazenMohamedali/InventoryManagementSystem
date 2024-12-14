@@ -1,11 +1,5 @@
-
-<<<<<<< HEAD
-public class person {
-
-=======
-
 public abstract class Person {
->>>>>>> 175b6c0936298d442bd454f0ab73a24c0f33bb2b
+
     // datafields
     private int id;
     private String phone_no;
