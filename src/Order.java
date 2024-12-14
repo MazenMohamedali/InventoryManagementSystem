@@ -11,7 +11,7 @@ import java.sql.Statement;
 public class Order {
     private static final String DB_URL = "jdbc:sqlite:./databaseIMS.db";
     private static int idCounter = 1; 
-    private final int orderID;       
+    private int orderID;       
     private int[] prodID;            
     private int[] amount;            
     private double[] pricePerID;       
@@ -21,15 +21,16 @@ public class Order {
     private LocalDate arrivalDate;    
 
 
+    public Order(){}
 
-    public Order(int[] prodID, int[] amount, double[] pricePerID, String clientAddress, LocalDate orderDate, LocalDate arrivalDate) {
+    public Order(int[] prodID, int[] amount, double[] pricePerID, String clientAddress, LocalDate orderDate) {
         this.orderID = idCounter++;  
         this.prodID = prodID;
         this.amount = amount;
         this.pricePerID = pricePerID;
         this.clientAddress = clientAddress;
         this.orderDate = orderDate;
-        this.arrivalDate = arrivalDate;
+        this.arrivalDate = LocalDate.now().plusDays(6);
         calculateTotalPrice();
     }
 
@@ -109,17 +110,20 @@ public class Order {
             }
         }
     }
-    public static void processOrder(String[] productNames, int[] amounts, String clientAddress) {
+
+
+
+    public static void processOrder(String[] productNames, int[] amounts, Client c) {
         LocalDate orderDate = LocalDate.now();
         LocalDate arrivalDate = LocalDate.now().plusDays(6);
         if (productNames.length != amounts.length) {
             throw new IllegalArgumentException("Product names and amounts arrays must have the same length.");
         }
 
-        String insertOrderSQL = "INSERT INTO orders (id,client_address, arrival_Date, price,client_id,order_datetime) VALUES (?, ?, ?, ?)";
+        String insertOrderSQL = "INSERT INTO orders (client_address, arrival_Date, price, client_id, order_datetime) VALUES (?, ?, ?, ?, ?)";
         String insertOrderProdSQL = "INSERT INTO order_prod (prod_id, order_id, quantity) VALUES (?, ?, ?)";
-        String updateProductSQL = "UPDATE product SET Quantity = Quantity - ? WHERE id,name=id,name ?";
-        String selectProductSQL = "SELECT id, Quantity FROM product WHERE name=name ?";
+        String updateProductSQL = "UPDATE product SET quantity = quantity - ? WHERE name = ?";
+        String selectProductSQL = "SELECT id, quantity FROM product WHERE name = ?";
 
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             conn.setAutoCommit(false); // Start transaction
@@ -129,20 +133,25 @@ public class Order {
                 PreparedStatement orderProdStmt = conn.prepareStatement(insertOrderProdSQL);
                 PreparedStatement updateProductStmt = conn.prepareStatement(updateProductSQL);
                 PreparedStatement selectProductStmt = conn.prepareStatement(selectProductSQL)
-            ) {
+            ) 
+            {
                 double totalPrice = 0.0;
 
                 // 1. Calculate total price and validate product availability
                 int[] productIDs = new int[productNames.length];
-                for (int i = 0; i < productNames.length; i++) {
+                for (int i = 0; i < productNames.length; i++) 
+                {
                     selectProductStmt.setString(1, productNames[i]);
-                    try (ResultSet rs = selectProductStmt.executeQuery()) {
-                        if (!rs.next()) {
+                    try (ResultSet rs = selectProductStmt.executeQuery()) 
+                    {
+                        if (!rs.next()) 
+                        {
                             throw new IllegalArgumentException("Product not found: " + productNames[i]);
                         }
                         int productID = rs.getInt("id");
-                        int availableAmount = rs.getInt("Quantity");
-                        if (amounts[i] > availableAmount) {
+                        int availableAmount = rs.getInt("quantity");
+                        if (amounts[i] > availableAmount) 
+                        {
                             throw new IllegalArgumentException("Insufficient stock for product: " + productNames[i]);
                         }
                         productIDs[i] = productID;
@@ -151,18 +160,24 @@ public class Order {
                 }
 
                 // 2. Log the order in the orders table
-                orderStmt.setString(1, clientAddress);
-                orderStmt.setDate(2, java.sql.Date.valueOf(orderDate));
-                orderStmt.setDate(3, java.sql.Date.valueOf(arrivalDate));
-                orderStmt.setDouble(4, totalPrice);
+                orderStmt.setString(1, c.getAddress());
+                orderStmt.setDate(2, java.sql.Date.valueOf(arrivalDate));
+                orderStmt.setDouble(3, totalPrice);
+                orderStmt.setInt(4, c.id);//TODO c.getID()
+                orderStmt.setDate(5, java.sql.Date.valueOf(orderDate));
+
                 orderStmt.executeUpdate();
 
                 // Retrieve the generated order ID
                 int orderID;
-                try (ResultSet rs = orderStmt.getGeneratedKeys()) {
-                    if (rs.next()) {
+                try (ResultSet rs = orderStmt.getGeneratedKeys()) 
+                {
+                    if (rs.next()) 
+                    {
                         orderID = rs.getInt(1);
-                    } else {
+                    } 
+                    else 
+                    {
                         throw new SQLException("Failed to retrieve generated order ID.");
                     }
                 }
@@ -170,8 +185,8 @@ public class Order {
                 // 3. Log order products and update product stock
                 for (int i = 0; i < productNames.length; i++) {
                     // Log in order_prod table
-                    orderProdStmt.setInt(1, orderID);
-                    orderProdStmt.setInt(2, productIDs[i]);
+                    orderProdStmt.setInt(1, productIDs[i]);
+                    orderProdStmt.setInt(2, orderID);
                     orderProdStmt.setInt(3, amounts[i]);
                     orderProdStmt.addBatch();
 
@@ -180,7 +195,7 @@ public class Order {
                     updateProductStmt.setString(2, productNames[i]);
                     updateProductStmt.addBatch();
                 }
-                orderProdStmt.executeBatch();
+                orderProdStmt.executeBatch(); //TODO dont know shit
                 updateProductStmt.executeBatch();
 
                 conn.commit(); // Commit transaction
@@ -193,6 +208,9 @@ public class Order {
             e.printStackTrace();
         }
     }
+
+    
+
 
     private static double getProductPrice(int productID, Connection conn) throws SQLException {
         String selectPriceSQL = "SELECT price FROM product WHERE id = ?";
@@ -209,6 +227,8 @@ public class Order {
     }
 
 
+
+
     //Display order details
     public void displayOrder() {
         System.out.println("Order Details:");
@@ -222,7 +242,12 @@ public class Order {
         }
         System.out.println("Total Price: " + totalPrice);
     }
-    public void saveToDatabase() {
+
+
+
+
+/*     public void saveToDatabase() 
+    {
             String insertOrderSQL = "INSERT INTO orders (orderID, clientAddress, orderDate, arrivalDate, totalPrice) VALUES (?, ?, ?, ?, ?)";
             String insertOrderDetailsSQL = "INSERT INTO order_details (orderID, prodID, amount, pricePerID) VALUES (?, ?, ?, ?)";
     
@@ -258,6 +283,6 @@ public class Order {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
+        } */
 }
 

@@ -59,11 +59,26 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
             {
                   try
                   {
-                        System.out.print("Please enter a product's name (enter 'exit' to finish): ");
+                        System.out.print("Please enter a product's name (enter 'exit' to finish, 'cancel' to return to menu): ");
                         temp = in.next();
-                        boolean found = Client.exists("product","name",temp);
+                      
+                        if(temp.equalsIgnoreCase("exit"))
+                        {
+                              break;
+                        }
 
-                        if(!found & !temp.equalsIgnoreCase("exit"))
+                        if(temp.equalsIgnoreCase("cancel"))
+                        {
+                              return;
+                        }
+
+
+                        boolean found = Client.exists("product","name",temp);
+                        if(!productNames.contains(temp) & found)
+                        {
+                              productNames.add(temp);
+                        }
+                        else if(!found)
                         {
                               printSeparator();
                               System.err.println("This product is not on the list");
@@ -71,10 +86,8 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                               continue;
                         }
                         
-                        if(!temp.equalsIgnoreCase("exit") & !productNames.contains(temp))
-                        {
-                              productNames.add(temp);
-                        }
+
+
                         else if(productNames.contains(temp))
                         {
                               printSeparator();
@@ -84,7 +97,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                   }
                   catch(Exception e)
                   {
-
+                        System.err.println("Error: " + e.getMessage());
                   }
             }
             
@@ -132,7 +145,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                                     products[i] = productNames.get(i);
                               }
       
-                              Order.processOrder(products, amounts, c.getAddress());
+                              Order.processOrder(products, amounts, c);
                               
                               printSeparator();
                               System.out.println("order has been placed! Please check the invoice or report to view the order's details");
@@ -180,7 +193,6 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
 
                               ans = "y";
                               continue;
-                              //TODO update DB
                         }
                         printSeparator();
                         System.out.println("order has been placed! Please check the invoice or report to view the order's details");
@@ -214,7 +226,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                         int count = 0;
                         for(String phone : client.phoneNumbers)
                         {
-                              System.out.print(count + 1 + phone + "\n");
+                              System.out.print(count + 1 + ": " +  phone + "\n");
                               count++;
                         }
                         System.out.println("Address: " + client.getAddress());
