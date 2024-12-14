@@ -18,9 +18,11 @@ public class AdminINF {
                 break;
             case 1:
                 supllierMenu();
+                setVisible();
                 break;
             case 2:
                 productMenu();
+                setVisible();
                 break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
@@ -58,6 +60,9 @@ public class AdminINF {
                 break;
             case 5:
                 Supplier.showAll();
+                break;
+            case 6:
+                setVisible();
                 break;
             default:
                 System.out.println("\t-->Wrong input try later<--");
