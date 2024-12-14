@@ -48,7 +48,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
 
 
 
-      public static void createOrder()//TODO finish prompts
+      public static void createOrder(int id)//TODO finish prompts
       {
             viewProducts();
             
@@ -78,7 +78,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                         else if(productNames.contains(temp))
                         {
                               printSeparator();
-                              System.out.println("this product has already been enterd");
+                              System.out.println("this product has already been entered");
                               printSeparator();
                         }
                   }
@@ -116,133 +116,87 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
             System.out.println("is This correct? (y/n)");
             String ans = in.next().toLowerCase();
 
-            if(ans.equals("y"))
+            boolean validInput = false;
+            do
             {
-                  //TODO update the DB
-
-                  
-                  printSeparator();
-                  System.out.println("order has been placed! Please check the invoice or report to view the order's details");
-                  printSeparator();
-            }
-            else
-            {
-                  for(int i = 0; i < productNames.size(); i++)
+                  if(ans.equals("y"))
                   {
-                        printSeparator();
-                        for(int j = 0; j < productNames.size(); j++)
+                        
+                        try 
                         {
-                              System.out.println(j + ": " + productNames.get(j) + ": " + amounts[j] + " units");
-                        }
-                        System.out.print("\nre-enter the name of the product (enter 'skip' to skip this product and 'exit' to finish)\n" + i + ": ");
-                        temp = in.next();
-                        boolean found = Client.exists("product", "name", temp);
-
-                        if(!found)
+                              Client c = Client.getData(id);
+                              validInput = true;
+                              String[] products = new String[productNames.size()];
+                              for(int i = 0; i < productNames.size(); i++)
+                              {
+                                    products[i] = productNames.get(i);
+                              }
+      
+                              Order.processOrder(products, amounts, c.getAddress());
+                              
+                              printSeparator();
+                              System.out.println("order has been placed! Please check the invoice or report to view the order's details");
+                              printSeparator();
+                        } 
+                        catch (SQLException e) 
                         {
                               printSeparator();
-                              System.err.println("This product is not on the list");
-                              continue;
+                              System.err.println("Error: " + e.getMessage());
+                              printSeparator();
                         }
-
-                        printSeparator();
-                        if(temp.equalsIgnoreCase("skip"))
-                        {
-                              continue;
-                        }
-                        if (temp.equalsIgnoreCase("exit")) 
-                        {
-                              break;      
-                        }
-                        productNames.set(i, temp);
-                        System.out.print("Please re-enter the amount of " + productNames.get(i) + ": ");
-                        amounts[i] = in.nextInt();
-
-                        
-                        //TODO update DB
                   }
-                  printSeparator();
-                  System.out.println("order has been placed! Please check the invoice or report to view the order's details");
-                  printSeparator();
-            }
+                  else if(ans.equals("n"))
+                  {
+                        validInput = true;
+                        for(int i = 0; i < productNames.size(); i++)
+                        {
+                              printSeparator();
+                              for(int j = 0; j < productNames.size(); j++)
+                              {
+                                    System.out.println(j + ": " + productNames.get(j) + ": " + amounts[j] + " units");
+                              }
+                              System.out.print("\nre-enter the name of the product (enter 'skip' to skip this product and 'exit' to finish)\n" + i + ": ");
+                              temp = in.next();
+                              boolean found = Client.exists("product", "name", temp);
+
+                              printSeparator();
+                              if(temp.equalsIgnoreCase("skip"))
+                              {
+                                    continue;
+                              }
+                              if (temp.equalsIgnoreCase("exit")) 
+                              {
+                                    break;      
+                              }
+                              if(!found)
+                              {
+                                    printSeparator();
+                                    System.err.println("This product is not on the list");
+                                    continue;
+                              }
+                              productNames.set(i, temp);
+                              System.out.print("Please re-enter the amount of " + productNames.get(i) + ": ");
+                              amounts[i] = in.nextInt();
+
+                              ans = "y";
+                              continue;
+                              //TODO update DB
+                        }
+                        printSeparator();
+                        System.out.println("order has been placed! Please check the invoice or report to view the order's details");
+                        printSeparator();
+                  }
+                  else
+                  {
+                        validInput = false;
+                        printSeparator();
+                        System.err.println("invalid input");
+                        printSeparator();
+                  }
+            }while(!validInput);
       }
 
-      public static void addAccount()
-      {
-            printSeparator();
-            System.out.print("Enter your name: ");
-            String name = in.next();
-            
 
-            String email = "";
-            boolean exists = true;
-            while(exists)
-            {
-                  System.out.print("Enter your email: ");
-                  email = in.next();
-                  exists = Client.exists("client", "email", email);
-                  if(exists)
-                  {
-                        System.out.println("Email already exists, enter a different one");
-                        printSeparator();
-                  }
-                  else
-                  {
-                        exists = false;
-                  }
-            }   
-            
-            
-            String phone = "";
-            exists = true;
-            while(exists)
-            {
-                  System.out.print("Enter your phone number: ");
-                  phone = in.next();
-                  exists = Client.exists("phone_numbers", "phone_number", phone);
-                  if(exists)
-                  {
-                        System.out.println("Phone number already exists, enter a different one");
-                        printSeparator();
-                  }
-                  else
-                  {
-                        exists = false;
-                  }
-            }
-            
-            
-            String password = "";
-            boolean confirmed = false;
-            while(!confirmed)
-            {
-                  System.out.print("Enter your password: ");
-                  password = in.next();
-                  System.out.print("Confirm your password: ");
-                  String confirmPassword = in.next();
-                  if(confirmPassword.equals(password))
-                  {
-                        confirmed = true;
-                  }
-                  else
-                  {
-                        System.out.println("Passwords do not match");
-                  }
-            }
-
-
-            System.out.println("Enter your address");
-            String address = in.next();
-
-            Client c = new Client(name, email, password, address, phone, 0);
-            Client.addToClientTable(c);
-            printSeparator();
-            System.out.println("You have been added successfully!!");
-            show(Client.getID(email));
-
-            
-            System.out.print("Enter your address: ");
-      }
 
       public static void editAccount(int id)
       {
@@ -252,6 +206,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                   Client client = Client.getData(id);
                   do
                   {
+                        printSeparator();
                         System.out.println("id: " + client.id);
                         System.out.println("Name: " + client.getName());
                         System.out.println("Email: " + client.getEmail());
@@ -390,9 +345,9 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
 
                         if(option == 1)//create order
                         {
-                              createOrder();
+                              createOrder(id);
                         }
-                        else if(option == 2)//TODO: view report
+                        else if(option == 2)//view report
                         {
                               ClientReport.genReport(id);
                         }
@@ -433,7 +388,7 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
 
       public static void main()
       {
-            show(10102);
+            show(1);
       }
 
       

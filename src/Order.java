@@ -109,7 +109,9 @@ public class Order {
             }
         }
     }
-    public static void processOrder(String[] productNames, int[] amounts, String clientAddress, LocalDate orderDate, LocalDate arrivalDate) {
+    public static void processOrder(String[] productNames, int[] amounts, String clientAddress) {
+        LocalDate orderDate = LocalDate.now();
+        LocalDate arrivalDate = LocalDate.now().plusDays(6);
         if (productNames.length != amounts.length) {
             throw new IllegalArgumentException("Product names and amounts arrays must have the same length.");
         }
