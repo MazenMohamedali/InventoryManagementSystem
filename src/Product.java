@@ -194,20 +194,26 @@ public class Product {
             ResultSet resultSet = statement.executeQuery();
 
             StringBuilder res = new StringBuilder();
-            if (!resultSet.next()) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            if (!resultSet.isBeforeFirst()) {
                 return "Not found";
-            } else {
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                int columnCount = metaData.getColumnCount();
+            } 
+            while (resultSet.next()) {
 
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = metaData.getColumnName(i);
                     Object columnValue = resultSet.getObject(i);
-                    res.append(columnName).append(": ").append(columnValue).append(", ");
-                }
+                    if(i==columnCount) {
+                        res.append(columnName).append(": ").append(columnValue).append("\n");
 
-                return res.toString();
+                    } else 
+                        res.append(columnName).append(": ").append(columnValue).append(", ");
+                }
             }
+
+            return res.toString();
+
         } catch (SQLException e) {
             return "Error: " + e.getMessage();
         }
@@ -222,14 +228,14 @@ public class Product {
     }
 
     public static String searchProductProduction(String productProductionDate) {
-        if (isValidDate(productProductionDate))
-            return "not found";
-        return search("product", "ProductionDate", productProductionDate);
+        if (!isValidDate(productProductionDate))
+            return "Invalid date format,correct formate is DD-MM-YYYY";
+        return search("product", "productionDate", productProductionDate);
     }
 
     public static String searchProductExpiration(String productExpirationDate) {
         if (isValidDate(productExpirationDate))
-            return "not found";
+            return "Invalid date format,correct formate is DD-MM-YYYY";
         return search("product", "expireDate", productExpirationDate);
     }
 
@@ -243,21 +249,46 @@ public class Product {
         return res;
     }   
 
-    // public static String[] offerForExpired() {
-    //     LocalDate currentDate = LocalDate.now();
-    //     int month = currentDate.getMonthValue();
-    //     int year = currentDate.getYear();
+    // offer 5 precen from our purchasePrecent
+    public static String[] offerForExpired() {
+        LocalDate currentDate = LocalDate.now();
+        int month = currentDate.getMonthValue();
+        int year = currentDate.getYear();
         
-    //     String[] col = {"id", "name", "expireDate", "quantity", "purchasePrecent"};
-    //     String[] res = connectDB.generlizeSelect(col, "product", "expireDate LIKE '%-" + month + "-" +year + "'");
-    //     for(int i=0; i<res.length; i++) {
-    //         String[] row = res[i].split(", ");
-    //         int id = Integer.parseInt(row[0]);
+        String[] col = {"id", "name", "expireDate", "quantity", "purchasePrecent", "price"};
+        String[] res = connectDB.generlizeSelect(col, "product", "expireDate LIKE '%-" + month + "-" +year + "'");
+        
+        int len = res.length;
+        int[] IDsOffer = new int[len];
 
+        for(int i=0; i<res.length; i++) {
+            String[] row = res[i].split(", ");
+            int id = Integer.parseInt(row[0]);
+            IDsOffer[i] = id;
+        }
+
+        StringBuilder sqlQuery = new StringBuilder("UPDATE product SET purchasePrecent = purchasePrecent - 5 WHERE id IN (");
+        for(int i=0; i<len; i++) {
+            if(i == len-1) {
+                sqlQuery.append("?)");
+            } else {
+                sqlQuery.append("?, ");
+            }
+        }
+        sqlQuery.append(" AND purchasePrecent>0");
+        try(Connection conn = DriverManager.getConnection(connectDB.getDburl());
+        PreparedStatement preState = conn.prepareStatement(sqlQuery.toString())) {
             
-    //     }
-    //     return res;
-    // }   
+            for(int i=0; i<len; i++) {
+                preState.setInt(i+1, IDsOffer[i]);
+            }
+            
+            preState.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }   
 
     // SHOW ALL FUNC --> OMAR MOHSEN <--
     static void showAll() {
@@ -354,13 +385,6 @@ public class Product {
                     "--------------------------------------------------------------------------------------------------");
         } catch (SQLException e) {
             System.out.println("SOMTHING WENT WRONG" + e.getMessage());
-        }
-    }
-
-    public static void main(String[] args) {
-        String[] res = notifyExpire();
-        for(String i : res) {
-            System.out.println(i);
         }
     }
 }

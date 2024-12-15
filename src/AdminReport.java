@@ -7,6 +7,7 @@ public class AdminReport {
     private int month;
     private int year;
     private int ProductsPurchasedLen;
+    private String reportPath;
 
 
     public AdminReport(int month, int year) {
@@ -32,6 +33,9 @@ public class AdminReport {
         this.year = year;
     }
 
+    public String getPath() {
+        return reportPath;
+    }
     // make fun convert array of String to Array of int
     // First, we need in spacific month what is orders 
     // ,then we return order id to use for bring quantity and product id
@@ -81,7 +85,7 @@ public class AdminReport {
     // Third, for this product we need to know what is price , Profit ratio, name
         
     // will return {"id", "Quantity sold", "name", "price", "current Quantity", "Profit_ratio", "category", "sup_id"}; for Products purchased
-    public String[] dataForProductsPurchased() {
+    private String[] dataForProductsPurchased() {
         String[] ProductsPurchased = ProductAndQuantityOrderd();
 
         StringBuilder whereQuery = new StringBuilder("id IN (");
@@ -116,7 +120,7 @@ public class AdminReport {
     public boolean generateMonthlyReport() throws IOException {
         String filePath = "../Reports/" + month + "_" + year + ".text"; // Add file extension for clarity
         File file = new File(filePath);
-        // System.out.println("File path: " + file.getAbsolutePath());
+        reportPath = file.getAbsolutePath();
 
         // Ensure the directory exists
         File reportDir = file.getParentFile();
@@ -131,13 +135,14 @@ public class AdminReport {
 
         // Use try-with-resources to handle closing
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-            // Write header
-            bw.write("---------------------------- Welcome ----------------------------\n");
-            bw.write("------------------ Report For Date: " + month + "/" + year + " ------------------\n");
-            bw.write("--------------------------------------------------------\n");
-            bw.write("ProdID\t\tQuantitySold\t\tName\t\tPrice\t\tCurrQuantity\t\tProfit Ratio\t\tCategory\t\tSupplierID\n");
-
-            // Process data
+            bw.write(String.format("%-60s\n", "---------------------------- Welcome ----------------------------"));
+            bw.write(String.format("%-60s\n", "------------------ Report For Date: " + month + "/" + year + " ------------------"));
+            bw.write(String.format("%-60s\n", "--------------------------------------------------------"));
+            
+            bw.write(String.format("%-10s %-15s %-20s %-10s %-15s %-15s %-20s %-15s\n",
+                    "ProdID", "QuantitySold", "Name", "Price", "CurrQuantity", "Profit Ratio", "Category", "SupplierID"));
+            bw.write(String.format("%-60s\n", "--------------------------------------------------------"));
+            
             double totalSold = 0;
             double totalProfit = 0;
             String[] dataForMonth = dataForProductsPurchased();
@@ -148,9 +153,8 @@ public class AdminReport {
                 double profitRatio = 0;
                 double price = 0;
 
-                // Write row data
                 for (int j = 0; j < row.length; j++) {
-                    bw.write(row[j] + "\t\t");
+                    bw.write(String.format("%-15s", row[j]));
                     if (j == 1) 
                         quantitySold = Double.parseDouble(row[j]); 
                     if (j == 3) 
@@ -165,19 +169,15 @@ public class AdminReport {
             }
 
             // Write totals
-            bw.write("--------------------------------------------------------\n");
-            bw.write("Total Profit: " + totalProfit + "\t\tTotal Sold: " + totalSold + "\n");
+            bw.write(String.format("%-60s\n", "--------------------------------------------------------"));
+            bw.write(String.format("Total Profit: %s %-20s Total Sold: %s\n", totalProfit, "", totalSold));
+
 
             return true; 
         } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
-    }
-    
-    public static void main(String[] args) throws IOException {
-        AdminReport test = new AdminReport(12, 2024);
-        System.out.println(test.generateMonthlyReport());
     }
 }
 

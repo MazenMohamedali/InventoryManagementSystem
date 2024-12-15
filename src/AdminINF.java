@@ -1,4 +1,5 @@
 
+import java.io.IOException;
 import java.util.*;
 
 public class AdminINF {
@@ -140,7 +141,31 @@ public class AdminINF {
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------------------------
+    // OFFER FOR PRODUCT WILL EXPIRED --> INTERFACE
+    private static void offer() {
+        // String[] col = {"id", "name", "expireDate", "quantity", "purchasePrecent", "price"};
+        String[] allData = Product.offerForExpired();
+        System.out.println("After offer: \n");
+    
+        System.out.printf("%-10s %-20s %-15s %-15s\n", "id", "name", "before_offer", "after_offer");
+    
+        for (String i : allData) {
+            // Split the data row
+            String[] row = i.split(", ");
+            
+            // Parse data for calculations
+            double price = Double.parseDouble(row[5]);
+            double purchasePercent = Integer.parseInt(row[4]);
+            double beforeOffer = price * (purchasePercent + 5) / 100.0;
+            double afterOffer = price * purchasePercent / 100.0;
+    
+            // Print data with proper alignment
+            System.out.printf("%-10s %-20s %-15.2f %-15.2f\n", row[0], row[1], beforeOffer > 0 ? beforeOffer : price, afterOffer > 0 ? afterOffer : price
+            );
+        }
+    }
 
+    // ------------------------------------------------------------------------------------------------------------------------------------------------
     // PROUCT MENU
     static void productMenu() {
         System.out.println("\nProduct Menu:");
@@ -148,7 +173,16 @@ public class AdminINF {
         System.out.println("2. Delete Product");
         System.out.println("3. Update Product");
         System.out.println("4. Display All Products");
-        System.out.println("5. Exit to Main Menu");
+
+        System.out.println("5. Search about product by name");
+        System.out.println("6. Search about product by category");
+        System.out.println("7. Search about product by production date");
+        System.out.println("8. Search about product by expiration date");
+        System.out.println("9. Notify products will expire soon");
+        System.out.println("10. Do offer for products will expire soon");
+        System.out.println("11. Do Report for spacific month");
+
+        System.out.println("12. Exit to Main Menu");
         System.out.print("Enter your choice: ");
 
         int choice = input.nextInt();
@@ -173,7 +207,68 @@ public class AdminINF {
                 break;
             // productMenu();
             // break;
+            case 6:
+                System.out.print("Enter category name: ");
+                String categoryname = input.nextLine();
+                System.out.println(Product.searchProductCategory(categoryname));
+                break;
+            // productMenu();
+            // break;
             case 5:
+                System.out.print("Enter product name: ");
+                String name = input.nextLine();
+                System.out.println(Product.searchProductName(name));
+                break;
+            // productMenu();
+            // break;
+            case 7:
+                System.out.print("Enter product production date: ");
+                String production_date = input.nextLine();
+                System.out.println(Product.searchProductProduction(production_date));
+                break;
+            // productMenu();
+            // break;
+            case 8:
+                System.out.print("Enter product expiration date: ");
+                String expiration = input.nextLine();
+                Product.searchProductExpiration(expiration);
+            // productMenu();
+            // break;
+            case 9:
+                String[] res = Product.notifyExpire();
+                for(String i : res) {
+                    System.out.println(i);
+                }
+                break;
+            // productMenu();
+            // break;
+            case 10:
+                offer();
+                break;
+            // productMenu();
+            // break;
+            case 11:
+                int month;
+                int year;
+                System.out.print("Enter Report for month: ");
+                month = input.nextInt();
+                System.out.print("Enter Report for year: ");
+                year = input.nextInt();
+
+                AdminReport repo = new AdminReport(month, year);
+                try {
+                    System.out.printf(repo.generateMonthlyReport() ? "Report is created in path %-10s\n" : "Error101\n", repo.getPath());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.printf("Error101\n");
+                }
+
+                System.out.println();
+                break;
+            // productMenu();
+            // break;
+
+            case 12:
                 setVisible();
                 break;
             default:
@@ -279,9 +374,5 @@ public class AdminINF {
         input.nextLine();
         Admin.updateProduct(id, value, option);
         Product.showProuct(id);
-    }
-
-    public static void main() {
-        AdminINF.setVisible();
     }
 }

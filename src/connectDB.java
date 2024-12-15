@@ -12,11 +12,11 @@ public class connectDB {
         return DBurl;
     }
 
-    // empty String for hasnot where
+    // empty String for has not where
 
 
     public static String[] generlizeSelect(String[] columns, String table, String hasWhere) {
-        StringBuilder sqlQuary = new StringBuilder("SELECT ");// = "SELECT id,  FROM orders WHERE arrival_date LIKE ?";
+        StringBuilder sqlQuary = new StringBuilder("SELECT ");
         
         int len = columns.length;
         for(int i=0; i<len; i++) {
