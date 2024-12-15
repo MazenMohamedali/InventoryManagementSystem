@@ -60,9 +60,9 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                   try
                   {
                         System.out.print("Please enter a product's name (enter 'exit' to finish): ");
-                        temp = in.next();
-                        boolean found = Client.exists("product","name",temp);
+                        temp = in.nextLine().strip();
 
+                        boolean found = Client.exists("product","name",temp);
                         if(!found & !temp.equalsIgnoreCase("exit"))
                         {
                               printSeparator();
@@ -82,9 +82,9 @@ public class ClientWindow //TODO shit spazes out when you enter a string instead
                               printSeparator();
                         }
                   }
-                  catch(Exception e)
+                  catch(IllegalArgumentException e)
                   {
-
+                        System.err.println("Error: " + e.getMessage());
                   }
             }
             
