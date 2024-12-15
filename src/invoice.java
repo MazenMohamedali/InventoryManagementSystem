@@ -10,13 +10,13 @@ public class invoice extends order {
      LocalDate orderDate;      
      LocalDate arrivalDate;  
 public void invoice(Order order){
-    this.amount = order.amount;
-    this.invoiceID = order.orderID;
-    this.pricePerproduct = order.pricePerID;
-    this.totalPrice = order.totalPrice;
-    this.clientAddress = order.clientAddress;
-    this.orderDate = order.orderDate;
-    this.arrivalDate = order.arrivalDate;
+    this.amount = order.getAmount();
+    this.invoiceID = order.getOrderID();
+    this.pricePerproduct = order.getPricePerID();
+    this.totalPrice = order.getTotalPrice();
+    this.clientAddress = order.getClientAddress();
+    this.orderDate = order.getOrderDate();
+    this.arrivalDate = order.getArrivalDate();
 }
 
 public void printinvoice(invoice invoice) {
